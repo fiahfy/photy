@@ -13,9 +13,14 @@ type File = { name: string; path: string; url: string }
 
 export const VideoContext = createContext<
   | {
-      file: File
+      entries: File[]
+      entry: File
       fullscreen: boolean
+      index: number
       message: string | undefined
+      movePrevious: () => void
+      moveNext: () => void
+      moveTo: (index: number) => void
       resetZoom: () => void
       toggleFullscreen: () => void
       zoom: number
@@ -35,6 +40,14 @@ export const VideoProvider = (props: Props) => {
   const [state] = useState('loading')
   const [zoom, setZoom] = useState(1)
 
+  const [entries, setEntries] = useState<File[]>([])
+  const [index, setIndex] = useState(0)
+
+  const entry = useMemo(
+    () => entries[index] ?? { name: '', path: '', url: '' },
+    [entries, index],
+  )
+
   const message = useMemo(() => {
     switch (state) {
       case 'loading':
@@ -52,8 +65,15 @@ export const VideoProvider = (props: Props) => {
     return () => removeListener()
   }, [])
 
+  useEffect(() => {
+    ;(async () => {
+      const entries = await window.electronAPI.getEntries(file.path)
+      setEntries(entries)
+    })()
+  }, [file.path])
+
   const toggleFullscreen = useCallback(
-    async () => window.electronAPI.toggleFullscreen(),
+    () => window.electronAPI.toggleFullscreen(),
     [],
   )
 
@@ -69,10 +89,27 @@ export const VideoProvider = (props: Props) => {
 
   const resetZoom = useCallback(() => setZoom(1), [])
 
+  const movePrevious = useCallback(
+    () => setIndex((index) => (index <= 0 ? entries.length - 1 : index - 1)),
+    [entries.length],
+  )
+
+  const moveNext = useCallback(
+    () => setIndex((index) => (index >= entries.length - 1 ? 0 : index + 1)),
+    [entries.length],
+  )
+
+  const moveTo = useCallback((index: number) => setIndex(index), [])
+
   const value = {
-    file,
+    entries,
+    entry,
     fullscreen,
+    index,
     message,
+    movePrevious,
+    moveNext,
+    moveTo,
     resetZoom,
     toggleFullscreen,
     zoom,

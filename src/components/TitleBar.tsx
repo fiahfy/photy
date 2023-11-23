@@ -2,7 +2,7 @@ import { AppBar, Toolbar, Typography } from '@mui/material'
 import useVideo from '~/hooks/useVideo'
 
 const TitleBar = () => {
-  const { file } = useVideo()
+  const { entry } = useVideo()
 
   return (
     <AppBar
@@ -21,7 +21,7 @@ const TitleBar = () => {
         }}
       >
         <Typography mt={0.25} noWrap variant="caption">
-          {file.name}
+          {entry.name}
         </Typography>
       </Toolbar>
     </AppBar>

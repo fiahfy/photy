@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('sendMessage', listener)
     return () => ipcRenderer.removeListener('sendMessage', listener)
   },
+  getEntries: (filePath: string) => ipcRenderer.invoke('getEntries', filePath),
   openFile: (filePath: string) => ipcRenderer.invoke('openFile', filePath),
   updateApplicationMenu: (params: ApplicationMenuParams) =>
     ipcRenderer.invoke('updateApplicationMenu', params),

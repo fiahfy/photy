@@ -21,7 +21,14 @@ const ControlBar = () => {
     selectShouldCloseWindowOnEscapeKey,
   )
 
-  const { fullscreen, toggleFullscreen } = useVideo()
+  const {
+    entries,
+    fullscreen,
+    index,
+    moveNext,
+    movePrevious,
+    toggleFullscreen,
+  } = useVideo()
 
   const FullscreenIcon = useMemo(
     () => (fullscreen ? FullscreenExitIcon : FullscreenEnterIcon),
@@ -65,7 +72,7 @@ const ControlBar = () => {
       <Toolbar disableGutters sx={{ gap: 0.5, px: 1 }} variant="dense">
         <IconButton
           disabled={false}
-          onClick={() => undefined}
+          onClick={movePrevious}
           onKeyDown={(e) => e.preventDefault()}
           size="small"
           title={''}
@@ -74,7 +81,7 @@ const ControlBar = () => {
         </IconButton>
         <IconButton
           disabled={false}
-          onClick={() => undefined}
+          onClick={moveNext}
           onKeyDown={(e) => e.preventDefault()}
           size="small"
           title={''}
@@ -89,7 +96,7 @@ const ControlBar = () => {
           }}
           variant="body2"
         >
-          99 / 100
+          {index + 1} / {entries.length}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <IconButton onClick={handleClickSettings} size="small" title="Settings">

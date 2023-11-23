@@ -1,7 +1,8 @@
 import { Box, Slider } from '@mui/material'
-import { useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { Transition } from 'react-transition-group'
 import useTheme from '~/hooks/useTheme'
+import useVideo from '~/hooks/useVideo'
 import { useAppSelector } from '~/store'
 import { selectShouldAlwaysShowSeekBar } from '~/store/settings'
 
@@ -14,9 +15,15 @@ const SeekBar = (props: Props) => {
 
   const shouldAlwaysShowSeekBar = useAppSelector(selectShouldAlwaysShowSeekBar)
 
+  const { entries, index, moveTo } = useVideo()
   const { theme } = useTheme()
 
   const nodeRef = useRef(null)
+
+  const handleChange = useCallback(
+    (_e: Event, value: number | number[]) => moveTo(value as number),
+    [moveTo],
+  )
 
   const timeout = theme.transitions.duration.shortest
 
@@ -59,11 +66,11 @@ const SeekBar = (props: Props) => {
           }}
         >
           <Slider
-            max={100}
-            onChange={() => undefined}
+            max={entries.length - 1}
+            onChange={handleChange}
             onKeyDown={(e) => e.preventDefault()}
             size="small"
-            step={0.01}
+            step={1}
             sx={{
               borderRadius: 0,
               inset: 0,
@@ -99,7 +106,7 @@ const SeekBar = (props: Props) => {
                 },
               },
             }}
-            value={99}
+            value={index}
             valueLabelDisplay="auto"
           />
         </Box>

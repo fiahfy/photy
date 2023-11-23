@@ -1,12 +1,5 @@
 import { Box, Fade, Typography } from '@mui/material'
-import {
-  MouseEvent,
-  WheelEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
 import ControlBar from '~/components/ControlBar'
 import DroppableMask from '~/components/DroppableMask'
 import SeekBar from '~/components/SeekBar'
@@ -18,9 +11,9 @@ import useVideo from '~/hooks/useVideo'
 const Player = () => {
   const { setVisible, visible } = useTrafficLight()
 
-  const { file, message, zoom, zoomBy } = useVideo()
+  const { entry, message } = useVideo()
 
-  const { dropping, onDragEnter, onDragLeave, onDragOver, onDrop } = useDrop()
+  const { dropping, ...dropHandlers } = useDrop()
 
   const [controlBarVisible, setControlBarVisible] = useState(false)
   const [hovered, setHovered] = useState(false)
@@ -99,15 +92,6 @@ const Player = () => {
     }
   }, [])
 
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        zoomBy(e.deltaY * 0.01)
-      }
-    },
-    [zoomBy],
-  )
-
   const handleMouseEnterBar = useCallback(() => {
     setHovered(true)
     resetTimer(true)
@@ -120,27 +104,26 @@ const Player = () => {
 
   return (
     <Box
-      onDragEnter={onDragEnter}
-      onDragLeave={onDragLeave}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
       onMouseDown={handleMouseDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onWheel={handleWheel}
       sx={{ height: '100%', width: '100%' }}
+      {...dropHandlers}
     >
       <Box
         ref={wrapperRef}
         sx={{
+          alignItems: 'center',
           cursor: dragOffset
             ? 'grabbing'
             : controlBarVisible
             ? undefined
             : 'none',
+          display: 'flex',
           height: '100%',
+          justifyContent: 'center',
           overflow: 'auto',
           width: '100%',
           '::-webkit-scrollbar': {
@@ -149,12 +132,12 @@ const Player = () => {
         }}
       >
         <img
-          src={file.url}
+          src={entry.url}
           style={{
             background: 'black',
             display: 'block',
-            minHeight: '100%',
-            width: `${100 * zoom}%`,
+            maxHeight: '100%',
+            maxWidth: '100%',
           }}
         />
       </Box>

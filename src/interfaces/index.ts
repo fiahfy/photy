@@ -13,6 +13,7 @@ type File = { name: string; path: string; url: string }
 export type IElectronAPI = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMessageListener: (callback: (message: any) => void) => () => void
+  getEntries: (filePath: string) => Promise<File[]>
   openFile: (filePath: string) => Promise<void>
   updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
 } & ContextMenuOperations &

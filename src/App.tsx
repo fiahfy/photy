@@ -18,9 +18,9 @@ const App = () => {
   )
   const dispatch = useAppDispatch()
 
-  const { file, resetZoom, zoomIn, zoomOut } = useVideo()
+  const { entry, moveNext, movePrevious } = useVideo()
 
-  useTitle(file.name)
+  useTitle(entry.name)
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {
@@ -28,22 +28,16 @@ const App = () => {
       switch (type) {
         case 'changeFile':
           return dispatch(newWindow(data.file))
-        case 'resetZoom':
-          return resetZoom()
         case 'toggleShouldAlwaysShowSeekBar':
           return dispatch(toggleShouldAlwaysShowSeekBar())
         case 'toggleFullscreen':
           return window.electronAPI.toggleFullscreen()
         case 'toggleShouldCloseWindowOnEscapeKey':
           return dispatch(toggleShouldCloseWindowOnEscapeKey())
-        case 'zoomIn':
-          return zoomIn()
-        case 'zoomOut':
-          return zoomOut()
       }
     })
     return () => removeListener()
-  }, [dispatch, resetZoom, zoomIn, zoomOut])
+  }, [dispatch])
 
   useEffect(() => {
     const handler = () => window.electronAPI.updateApplicationMenu({})
@@ -57,10 +51,16 @@ const App = () => {
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault()
-          return
+          return movePrevious()
         case 'ArrowRight':
           e.preventDefault()
-          return
+          return moveNext()
+        case 'ArrowUp':
+          e.preventDefault()
+          return movePrevious()
+        case 'ArrowDown':
+          e.preventDefault()
+          return moveNext()
         case 'Escape':
           e.preventDefault()
           if (shouldCloseWindowOnEscapeKey) {
@@ -75,7 +75,7 @@ const App = () => {
     }
     document.body.addEventListener('keydown', handler)
     return () => document.body.removeEventListener('keydown', handler)
-  }, [resetZoom, shouldCloseWindowOnEscapeKey, zoomIn, zoomOut])
+  }, [moveNext, movePrevious, shouldCloseWindowOnEscapeKey])
 
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 

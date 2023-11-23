@@ -15,7 +15,7 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    replace(_state, action: PayloadAction<State>) {
+    replaceState(_state, action: PayloadAction<State>) {
       return action.payload
     },
     toggleShouldAlwaysShowSeekBar(state) {
@@ -34,7 +34,7 @@ export const settingsSlice = createSlice({
 })
 
 export const {
-  replace,
+  replaceState,
   toggleShouldAlwaysShowSeekBar,
   toggleShouldCloseWindowOnEscapeKey,
 } = settingsSlice.actions
