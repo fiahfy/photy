@@ -7,7 +7,7 @@ import {
 } from '@mui/icons-material'
 import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material'
 import { useMemo } from 'react'
-import useVideo from '~/hooks/useVideo'
+import useImage from '~/hooks/useImage'
 import { useAppSelector } from '~/store'
 import {
   selectShouldAlwaysShowSeekBar,
@@ -28,7 +28,7 @@ const ControlBar = () => {
     moveNext,
     movePrevious,
     toggleFullscreen,
-  } = useVideo()
+  } = useImage()
 
   const FullscreenIcon = useMemo(
     () => (fullscreen ? FullscreenExitIcon : FullscreenEnterIcon),

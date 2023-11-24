@@ -1,8 +1,8 @@
 import { Box, Slider } from '@mui/material'
 import { useCallback, useMemo, useRef } from 'react'
 import { Transition } from 'react-transition-group'
+import useImage from '~/hooks/useImage'
 import useTheme from '~/hooks/useTheme'
-import useVideo from '~/hooks/useVideo'
 import { useAppSelector } from '~/store'
 import { selectShouldAlwaysShowSeekBar } from '~/store/settings'
 
@@ -15,7 +15,7 @@ const SeekBar = (props: Props) => {
 
   const shouldAlwaysShowSeekBar = useAppSelector(selectShouldAlwaysShowSeekBar)
 
-  const { images, index, moveTo } = useVideo()
+  const { images, index, moveTo } = useImage()
   const { theme } = useTheme()
 
   const nodeRef = useRef(null)

@@ -5,19 +5,19 @@ import '@fontsource/roboto/700.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '~/App'
+import { ImageProvider } from '~/contexts/ImageContext'
 import { StoreProvider } from '~/contexts/StoreContext'
 import { ThemeProvider } from '~/contexts/ThemeContext'
 import { TrafficLightProvider } from '~/contexts/TrafficLightContext'
-import { VideoProvider } from '~/contexts/VideoContext'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <StoreProvider>
       <ThemeProvider>
         <TrafficLightProvider>
-          <VideoProvider>
+          <ImageProvider>
             <App />
-          </VideoProvider>
+          </ImageProvider>
         </TrafficLightProvider>
       </ThemeProvider>
     </StoreProvider>

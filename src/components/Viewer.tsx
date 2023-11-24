@@ -12,13 +12,13 @@ import DroppableMask from '~/components/DroppableMask'
 import SeekBar from '~/components/SeekBar'
 import TitleBar from '~/components/TitleBar'
 import useDrop from '~/hooks/useDrop'
+import useImage from '~/hooks/useImage'
 import useTrafficLight from '~/hooks/useTrafficLight'
-import useVideo from '~/hooks/useVideo'
 
-const Player = () => {
+const Viewer = () => {
   const { setVisible, visible } = useTrafficLight()
 
-  const { image, status: fetchStatus } = useVideo()
+  const { image, status: fetchStatus } = useImage()
 
   const { dropping, ...dropHandlers } = useDrop()
 
@@ -242,4 +242,4 @@ const Player = () => {
   )
 }
 
-export default Player
+export default Viewer

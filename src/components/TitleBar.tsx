@@ -1,8 +1,8 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
-import useVideo from '~/hooks/useVideo'
+import useImage from '~/hooks/useImage'
 
 const TitleBar = () => {
-  const { image } = useVideo()
+  const { image } = useImage()
 
   return (
     <AppBar

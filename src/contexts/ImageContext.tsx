@@ -12,7 +12,7 @@ import { isImageFile } from '~/utils/file'
 
 type File = { name: string; path: string; url: string }
 
-export const VideoContext = createContext<
+export const ImageContext = createContext<
   | {
       fullscreen: boolean
       image: File
@@ -34,7 +34,7 @@ export const VideoContext = createContext<
 
 type Props = { children: ReactNode }
 
-export const VideoProvider = (props: Props) => {
+export const ImageProvider = (props: Props) => {
   const { children } = props
   const file = useAppSelector(selectFile)
   const [fullscreen, setFullscreen] = useState(false)
@@ -134,5 +134,5 @@ export const VideoProvider = (props: Props) => {
     zoomOut,
   }
 
-  return <VideoContext.Provider value={value}>{children}</VideoContext.Provider>
+  return <ImageContext.Provider value={value}>{children}</ImageContext.Provider>
 }

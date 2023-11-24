@@ -1,8 +1,8 @@
 import { Box, GlobalStyles } from '@mui/material'
 import { useEffect, useMemo } from 'react'
-import Player from '~/components/Player'
+import Viewer from '~/components/Viewer'
+import useImage from '~/hooks/useImage'
 import useTitle from '~/hooks/useTitle'
-import useVideo from '~/hooks/useVideo'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectShouldCloseWindowOnEscapeKey,
@@ -18,7 +18,7 @@ const App = () => {
   )
   const dispatch = useAppDispatch()
 
-  const { image, moveNext, movePrevious } = useVideo()
+  const { image, moveNext, movePrevious } = useImage()
 
   useTitle(image.name)
 
@@ -91,7 +91,7 @@ const App = () => {
       }}
     >
       <GlobalStyles styles={{ 'html, body, #root': { height: '100%' } }} />
-      <Player />
+      <Viewer />
     </Box>
   )
 }
