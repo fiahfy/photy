@@ -1,5 +1,12 @@
 import { Box, Fade, Typography } from '@mui/material'
-import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import ControlBar from '~/components/ControlBar'
 import DroppableMask from '~/components/DroppableMask'
 import SeekBar from '~/components/SeekBar'
@@ -11,7 +18,7 @@ import useVideo from '~/hooks/useVideo'
 const Player = () => {
   const { setVisible, visible } = useTrafficLight()
 
-  const { entry, message } = useVideo()
+  const { image, status: fetchStatus } = useVideo()
 
   const { dropping, ...dropHandlers } = useDrop()
 
@@ -21,6 +28,9 @@ const Player = () => {
     x: number
     y: number
   }>()
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(
+    'loading',
+  )
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const timer = useRef<number>()
@@ -28,6 +38,47 @@ const Player = () => {
   useEffect(() => {
     setVisible(controlBarVisible)
   }, [controlBarVisible, setVisible])
+
+  useEffect(() => {
+    ;(async () => {
+      setStatus('loading')
+      const success = await (async () => {
+        if (!image.url) {
+          return true
+        }
+        try {
+          await new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => resolve(undefined)
+            img.onerror = (e) => reject(e)
+            img.src = image.url
+          })
+          return true
+        } catch (e) {
+          return false
+        }
+      })()
+      setStatus(success ? 'loaded' : 'error')
+    })()
+  }, [image.url])
+
+  const message = useMemo(() => {
+    switch (fetchStatus) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Failed to load.'
+      default:
+        switch (status) {
+          case 'loading':
+            return 'Loading...'
+          case 'error':
+            return 'Failed to load.'
+          default:
+            return undefined
+        }
+    }
+  }, [fetchStatus, status])
 
   const clearTimer = useCallback(() => window.clearTimeout(timer.current), [])
 
@@ -131,15 +182,17 @@ const Player = () => {
           },
         }}
       >
-        <img
-          src={entry.url}
-          style={{
-            background: 'black',
-            display: 'block',
-            maxHeight: '100%',
-            maxWidth: '100%',
-          }}
-        />
+        {status === 'loaded' && (
+          <img
+            src={image.url}
+            style={{
+              background: 'black',
+              display: 'block',
+              maxHeight: '100%',
+              maxWidth: '100%',
+            }}
+          />
+        )}
       </Box>
       <Box
         sx={{

@@ -22,7 +22,7 @@ const ControlBar = () => {
   )
 
   const {
-    entries,
+    images,
     fullscreen,
     index,
     moveNext,
@@ -96,7 +96,7 @@ const ControlBar = () => {
           }}
           variant="body2"
         >
-          {index + 1} / {entries.length}
+          {index + 1} / {images.length}
         </Typography>
         <Box sx={{ flexGrow: 1 }} />
         <IconButton onClick={handleClickSettings} size="small" title="Settings">

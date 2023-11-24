@@ -15,7 +15,7 @@ const SeekBar = (props: Props) => {
 
   const shouldAlwaysShowSeekBar = useAppSelector(selectShouldAlwaysShowSeekBar)
 
-  const { entries, index, moveTo } = useVideo()
+  const { images, index, moveTo } = useVideo()
   const { theme } = useTheme()
 
   const nodeRef = useRef(null)
@@ -66,7 +66,7 @@ const SeekBar = (props: Props) => {
           }}
         >
           <Slider
-            max={entries.length - 1}
+            max={images.length - 1}
             onChange={handleChange}
             onKeyDown={(e) => e.preventDefault()}
             size="small"

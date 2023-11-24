@@ -8,20 +8,21 @@ import {
 } from 'react'
 import { useAppSelector } from '~/store'
 import { selectFile } from '~/store/window'
+import { isImageFile } from '~/utils/file'
 
 type File = { name: string; path: string; url: string }
 
 export const VideoContext = createContext<
   | {
-      entries: File[]
-      entry: File
       fullscreen: boolean
+      image: File
+      images: File[]
       index: number
-      message: string | undefined
       movePrevious: () => void
       moveNext: () => void
       moveTo: (index: number) => void
       resetZoom: () => void
+      status: 'loading' | 'loaded' | 'error'
       toggleFullscreen: () => void
       zoom: number
       zoomBy: (value: number) => void
@@ -37,19 +38,26 @@ export const VideoProvider = (props: Props) => {
   const { children } = props
   const file = useAppSelector(selectFile)
   const [fullscreen, setFullscreen] = useState(false)
-  const [state] = useState('loading')
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(
+    'loading',
+  )
   const [zoom, setZoom] = useState(1)
 
   const [entries, setEntries] = useState<File[]>([])
   const [index, setIndex] = useState(0)
 
-  const entry = useMemo(
-    () => entries[index] ?? { name: '', path: '', url: '' },
-    [entries, index],
+  const images = useMemo(
+    () => entries.filter((entry) => isImageFile(entry.path)),
+    [entries],
+  )
+
+  const image = useMemo(
+    () => images[index] ?? { name: '', path: '', url: '' },
+    [images, index],
   )
 
   const message = useMemo(() => {
-    switch (state) {
+    switch (status) {
       case 'loading':
         return 'Loading...'
       case 'error':
@@ -57,7 +65,7 @@ export const VideoProvider = (props: Props) => {
       default:
         return undefined
     }
-  }, [state])
+  }, [status])
 
   useEffect(() => {
     const removeListener =
@@ -67,8 +75,15 @@ export const VideoProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      const entries = await window.electronAPI.getEntries(file.path)
-      setEntries(entries)
+      setStatus('loading')
+      setEntries([])
+      try {
+        const entries = await window.electronAPI.getEntries(file.path)
+        setEntries(entries)
+        setStatus('loaded')
+      } catch (e) {
+        setStatus('error')
+      }
     })()
   }, [file.path])
 
@@ -90,27 +105,28 @@ export const VideoProvider = (props: Props) => {
   const resetZoom = useCallback(() => setZoom(1), [])
 
   const movePrevious = useCallback(
-    () => setIndex((index) => (index <= 0 ? entries.length - 1 : index - 1)),
-    [entries.length],
+    () => setIndex((index) => (index <= 0 ? images.length - 1 : index - 1)),
+    [images.length],
   )
 
   const moveNext = useCallback(
-    () => setIndex((index) => (index >= entries.length - 1 ? 0 : index + 1)),
-    [entries.length],
+    () => setIndex((index) => (index >= images.length - 1 ? 0 : index + 1)),
+    [images.length],
   )
 
   const moveTo = useCallback((index: number) => setIndex(index), [])
 
   const value = {
-    entries,
-    entry,
     fullscreen,
+    image,
+    images,
     index,
     message,
     movePrevious,
     moveNext,
     moveTo,
     resetZoom,
+    status,
     toggleFullscreen,
     zoom,
     zoomBy,

@@ -18,9 +18,9 @@ const App = () => {
   )
   const dispatch = useAppDispatch()
 
-  const { entry, moveNext, movePrevious } = useVideo()
+  const { image, moveNext, movePrevious } = useVideo()
 
-  useTitle(entry.name)
+  useTitle(image.name)
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {
