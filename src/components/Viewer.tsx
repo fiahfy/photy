@@ -170,8 +170,8 @@ const Viewer = () => {
           cursor: dragOffset
             ? 'grabbing'
             : controlBarVisible
-            ? undefined
-            : 'none',
+              ? undefined
+              : 'none',
           display: 'flex',
           height: '100%',
           justifyContent: 'center',
