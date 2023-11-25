@@ -18,9 +18,9 @@ const App = () => {
   )
   const dispatch = useAppDispatch()
 
-  const { image, moveNext, movePrevious } = useImage()
+  const { directory, moveNext, movePrevious } = useImage()
 
-  useTitle(image?.name ?? '')
+  useTitle(directory?.name ?? '')
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {
