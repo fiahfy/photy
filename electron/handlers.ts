@@ -19,9 +19,20 @@ const registerHandlers = () => {
     event.sender.send('sendMessage', { type: 'changeFile', data: { file } })
   })
   ipcMain.handle(
-    'getEntries',
+    'getParentDirectory',
     async (_event: IpcMainInvokeEvent, filePath: string) => {
-      const directoryPath = dirname(filePath)
+      const path = dirname(filePath)
+      const name = basename(path)
+      return {
+        name: name.normalize('NFC'),
+        path,
+        url: pathToFileURL(path).href,
+      }
+    },
+  )
+  ipcMain.handle(
+    'getEntries',
+    async (_event: IpcMainInvokeEvent, directoryPath: string) => {
       const dirents = await readdir(directoryPath, { withFileTypes: true })
       return dirents.reduce((acc, dirent) => {
         const path = join(directoryPath, dirent.name)

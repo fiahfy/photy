@@ -1,9 +1,9 @@
 import {
   Fullscreen as FullscreenEnterIcon,
   FullscreenExit as FullscreenExitIcon,
+  KeyboardArrowLeft as KeyboardArrowLeftIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
   Settings as SettingsIcon,
-  SkipNext as SkipNextIcon,
-  SkipPrevious as SkipPreviousIcon,
 } from '@mui/icons-material'
 import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material'
 import { useMemo } from 'react'
@@ -22,6 +22,7 @@ const ControlBar = () => {
   )
 
   const {
+    image,
     images,
     fullscreen,
     index,
@@ -75,18 +76,18 @@ const ControlBar = () => {
           onClick={movePrevious}
           onKeyDown={(e) => e.preventDefault()}
           size="small"
-          title={''}
+          title="Previous Image"
         >
-          <SkipPreviousIcon fontSize="small" />
+          <KeyboardArrowLeftIcon fontSize="small" />
         </IconButton>
         <IconButton
           disabled={false}
           onClick={moveNext}
           onKeyDown={(e) => e.preventDefault()}
           size="small"
-          title={''}
+          title="Next Image"
         >
-          <SkipNextIcon fontSize="small" />
+          <KeyboardArrowRightIcon fontSize="small" />
         </IconButton>
         <Typography
           noWrap
@@ -98,6 +99,11 @@ const ControlBar = () => {
         >
           {index + 1} / {images.length}
         </Typography>
+        {image && (
+          <Typography noWrap variant="body2">
+            ・ {image.name}
+          </Typography>
+        )}
         <Box sx={{ flexGrow: 1 }} />
         <IconButton onClick={handleClickSettings} size="small" title="Settings">
           <SettingsIcon fontSize="small" />

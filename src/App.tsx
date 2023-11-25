@@ -20,7 +20,7 @@ const App = () => {
 
   const { image, moveNext, movePrevious } = useImage()
 
-  useTitle(image.name)
+  useTitle(image?.name ?? '')
 
   useEffect(() => {
     const removeListener = window.electronAPI.addMessageListener((message) => {

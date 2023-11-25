@@ -21,7 +21,7 @@ const SeekBar = (props: Props) => {
   const nodeRef = useRef(null)
 
   const handleChange = useCallback(
-    (_e: Event, value: number | number[]) => moveTo(value as number),
+    (_e: Event, value: number | number[]) => moveTo((value as number) - 1),
     [moveTo],
   )
 
@@ -66,7 +66,8 @@ const SeekBar = (props: Props) => {
           }}
         >
           <Slider
-            max={images.length - 1}
+            max={images.length}
+            min={1}
             onChange={handleChange}
             onKeyDown={(e) => e.preventDefault()}
             size="small"
@@ -106,7 +107,7 @@ const SeekBar = (props: Props) => {
                 },
               },
             }}
-            value={index}
+            value={index + 1}
             valueLabelDisplay="auto"
           />
         </Box>

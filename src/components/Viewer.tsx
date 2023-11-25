@@ -43,7 +43,7 @@ const Viewer = () => {
     ;(async () => {
       setStatus('loading')
       const success = await (async () => {
-        if (!image.url) {
+        if (!image?.url) {
           return true
         }
         try {
@@ -60,7 +60,7 @@ const Viewer = () => {
       })()
       setStatus(success ? 'loaded' : 'error')
     })()
-  }, [image.url])
+  }, [image?.url])
 
   const message = useMemo(() => {
     switch (fetchStatus) {
@@ -182,7 +182,7 @@ const Viewer = () => {
           },
         }}
       >
-        {status === 'loaded' && (
+        {status === 'loaded' && image && (
           <img
             src={image.url}
             style={{

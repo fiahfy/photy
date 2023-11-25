@@ -2,7 +2,7 @@ import { AppBar, Toolbar, Typography } from '@mui/material'
 import useImage from '~/hooks/useImage'
 
 const TitleBar = () => {
-  const { image } = useImage()
+  const { directory } = useImage()
 
   return (
     <AppBar
@@ -20,9 +20,11 @@ const TitleBar = () => {
           px: 8.5,
         }}
       >
-        <Typography mt={0.25} noWrap variant="caption">
-          {image.name}
-        </Typography>
+        {directory && (
+          <Typography mt={0.25} noWrap variant="caption">
+            {directory.name}
+          </Typography>
+        )}
       </Toolbar>
     </AppBar>
   )

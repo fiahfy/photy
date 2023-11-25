@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useState,
 } from 'react'
 import { useAppSelector } from '~/store'
@@ -14,8 +15,9 @@ type File = { name: string; path: string; url: string }
 
 export const ImageContext = createContext<
   | {
+      directory: File | undefined
       fullscreen: boolean
-      image: File
+      image: File | undefined
       images: File[]
       index: number
       movePrevious: () => void
@@ -32,18 +34,48 @@ export const ImageContext = createContext<
   | undefined
 >(undefined)
 
+type State = {
+  directory: File | undefined
+  entries: File[]
+  status: 'error' | 'loaded' | 'loading'
+}
+
+type Action =
+  | { type: 'error' }
+  | {
+      type: 'loaded'
+      payload: { directory: File; entries: File[] }
+    }
+  | { type: 'loading' }
+
+const reducer = (_state: State, action: Action) => {
+  switch (action.type) {
+    case 'loaded':
+      return {
+        ...action.payload,
+        status: action.type,
+      }
+    case 'error':
+    case 'loading':
+      return { directory: undefined, entries: [], status: action.type }
+  }
+}
+
 type Props = { children: ReactNode }
 
 export const ImageProvider = (props: Props) => {
   const { children } = props
+
   const file = useAppSelector(selectFile)
+
   const [fullscreen, setFullscreen] = useState(false)
-  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(
-    'loading',
-  )
   const [zoom, setZoom] = useState(1)
 
-  const [entries, setEntries] = useState<File[]>([])
+  const [{ directory, entries, status }, dispatch] = useReducer(reducer, {
+    directory: undefined,
+    entries: [],
+    status: 'loading',
+  })
   const [index, setIndex] = useState(0)
 
   const images = useMemo(
@@ -51,21 +83,7 @@ export const ImageProvider = (props: Props) => {
     [entries],
   )
 
-  const image = useMemo(
-    () => images[index] ?? { name: '', path: '', url: '' },
-    [images, index],
-  )
-
-  const message = useMemo(() => {
-    switch (status) {
-      case 'loading':
-        return 'Loading...'
-      case 'error':
-        return 'Failed to load.'
-      default:
-        return undefined
-    }
-  }, [status])
+  const image = useMemo(() => images[index], [images, index])
 
   useEffect(() => {
     const removeListener =
@@ -75,17 +93,21 @@ export const ImageProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      setStatus('loading')
-      setEntries([])
+      dispatch({ type: 'loading' })
       try {
-        const entries = await window.electronAPI.getEntries(file.path)
-        setEntries(entries)
-        setStatus('loaded')
+        const directory = await window.electronAPI.getParentDirectory(file.path)
+        const entries = await window.electronAPI.getEntries(directory.path)
+        dispatch({ type: 'loaded', payload: { directory, entries } })
       } catch (e) {
-        setStatus('error')
+        dispatch({ type: 'error' })
       }
     })()
   }, [file.path])
+
+  useEffect(() => {
+    const index = images.findIndex((entry) => entry.path === file.path)
+    setIndex(index === -1 ? 0 : index)
+  }, [file.path, images])
 
   const toggleFullscreen = useCallback(
     () => window.electronAPI.toggleFullscreen(),
@@ -117,11 +139,11 @@ export const ImageProvider = (props: Props) => {
   const moveTo = useCallback((index: number) => setIndex(index), [])
 
   const value = {
+    directory,
     fullscreen,
     image,
     images,
     index,
-    message,
     movePrevious,
     moveNext,
     moveTo,
