@@ -4,11 +4,13 @@ import { AppState } from '~/store'
 type State = {
   shouldAlwaysShowSeekBar: boolean
   shouldCloseWindowOnEscapeKey: boolean
+  viewModeOnOpen: 'fullscreen' | 'maximized' | 'default'
 }
 
 const initialState: State = {
   shouldAlwaysShowSeekBar: false,
   shouldCloseWindowOnEscapeKey: false,
+  viewModeOnOpen: 'default',
 }
 
 export const settingsSlice = createSlice({
@@ -17,6 +19,16 @@ export const settingsSlice = createSlice({
   reducers: {
     replaceState(_state, action: PayloadAction<State>) {
       return action.payload
+    },
+    setViewModeOnOpen(
+      state,
+      action: PayloadAction<{ viewModeOnOpen: State['viewModeOnOpen'] }>,
+    ) {
+      const { viewModeOnOpen } = action.payload
+      return {
+        ...state,
+        viewModeOnOpen,
+      }
     },
     toggleShouldAlwaysShowSeekBar(state) {
       return {
@@ -35,6 +47,7 @@ export const settingsSlice = createSlice({
 
 export const {
   replaceState,
+  setViewModeOnOpen,
   toggleShouldAlwaysShowSeekBar,
   toggleShouldCloseWindowOnEscapeKey,
 } = settingsSlice.actions
@@ -51,4 +64,9 @@ export const selectShouldAlwaysShowSeekBar = createSelector(
 export const selectShouldCloseWindowOnEscapeKey = createSelector(
   selectSettings,
   (settings) => settings.shouldCloseWindowOnEscapeKey,
+)
+
+export const selectViewModeOnOpen = createSelector(
+  selectSettings,
+  (settings) => settings.viewModeOnOpen,
 )

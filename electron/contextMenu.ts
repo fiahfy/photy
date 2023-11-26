@@ -19,6 +19,23 @@ const registerContextMenu = () => {
       click: () => send(event, { type: 'toggleShouldCloseWindowOnEscapeKey' }),
       type: 'checkbox',
     }),
+    viewModeOnOpen: (event, _params, { viewModeOnOpen }) => ({
+      label: 'View Mode on Open',
+      submenu: [
+        { label: 'Fullscreen', value: 'fullscreen' },
+        { label: 'Maximized', value: 'maximized' },
+        { label: 'Default', value: 'default' },
+      ].map(({ label, value }) => ({
+        checked: value === viewModeOnOpen,
+        click: () =>
+          send(event, {
+            type: 'setViewModeOnOpen',
+            data: { viewModeOnOpen: value },
+          }),
+        label,
+        type: 'radio',
+      })),
+    }),
   }
 
   register(actionCreators)

@@ -12,6 +12,7 @@ import { useAppSelector } from '~/store'
 import {
   selectShouldAlwaysShowSeekBar,
   selectShouldCloseWindowOnEscapeKey,
+  selectViewModeOnOpen,
 } from '~/store/settings'
 import { createContextMenuHandler } from '~/utils/contextMenu'
 
@@ -20,6 +21,7 @@ const ControlBar = () => {
   const shouldCloseWindowOnEscapeKey = useAppSelector(
     selectShouldCloseWindowOnEscapeKey,
   )
+  const viewModeOnOpen = useAppSelector(selectViewModeOnOpen)
 
   const {
     image,
@@ -47,8 +49,12 @@ const ControlBar = () => {
           type: 'closeWindowOnEscapeKey',
           data: { checked: shouldCloseWindowOnEscapeKey },
         },
+        {
+          type: 'viewModeOnOpen',
+          data: { viewModeOnOpen },
+        },
       ]),
-    [shouldAlwaysShowSeekBar, shouldCloseWindowOnEscapeKey],
+    [shouldAlwaysShowSeekBar, shouldCloseWindowOnEscapeKey, viewModeOnOpen],
   )
 
   return (

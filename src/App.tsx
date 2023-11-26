@@ -6,6 +6,7 @@ import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
   selectShouldCloseWindowOnEscapeKey,
+  setViewModeOnOpen,
   toggleShouldAlwaysShowSeekBar,
   toggleShouldCloseWindowOnEscapeKey,
 } from '~/store/settings'
@@ -28,10 +29,14 @@ const App = () => {
       switch (type) {
         case 'changeFile':
           return dispatch(newWindow(data.file))
-        case 'toggleShouldAlwaysShowSeekBar':
-          return dispatch(toggleShouldAlwaysShowSeekBar())
+        case 'setViewModeOnOpen':
+          return dispatch(
+            setViewModeOnOpen({ viewModeOnOpen: data.viewModeOnOpen }),
+          )
         case 'toggleFullscreen':
           return window.electronAPI.toggleFullscreen()
+        case 'toggleShouldAlwaysShowSeekBar':
+          return dispatch(toggleShouldAlwaysShowSeekBar())
         case 'toggleShouldCloseWindowOnEscapeKey':
           return dispatch(toggleShouldCloseWindowOnEscapeKey())
       }
