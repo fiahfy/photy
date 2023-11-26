@@ -190,6 +190,7 @@ const Viewer = () => {
               display: 'block',
               maxHeight: '100%',
               maxWidth: '100%',
+              pointerEvents: 'none',
             }}
           />
         )}
