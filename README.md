@@ -10,6 +10,7 @@
 
 ## TODOs
 
+- [ ] Zoom In/Out
 - [ ] Use Electron Forge
 
 ## Screenshots
