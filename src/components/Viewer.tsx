@@ -35,9 +35,10 @@ const Viewer = () => {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const timer = useRef<number>()
 
-  useEffect(() => {
-    setVisible(controlBarVisible)
-  }, [controlBarVisible, setVisible])
+  useEffect(
+    () => setVisible(controlBarVisible),
+    [controlBarVisible, setVisible],
+  )
 
   useEffect(() => {
     ;(async () => {
