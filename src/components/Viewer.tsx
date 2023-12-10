@@ -1,9 +1,11 @@
 import { Box, Fade, Typography } from '@mui/material'
 import {
   MouseEvent,
+  WheelEvent,
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
 } from 'react'
@@ -15,10 +17,37 @@ import useDrop from '~/hooks/useDrop'
 import useImage from '~/hooks/useImage'
 import useTrafficLight from '~/hooks/useTrafficLight'
 
+type State = {
+  size: { height: number; width: number } | undefined
+  status: 'error' | 'loaded' | 'loading'
+  url: string | undefined
+}
+
+type Action =
+  | { type: 'error' }
+  | {
+      type: 'loaded'
+      payload: { size: { height: number; width: number }; url: string }
+    }
+  | { type: 'loading' }
+
+const reducer = (_state: State, action: Action) => {
+  switch (action.type) {
+    case 'loaded':
+      return {
+        ...action.payload,
+        status: action.type,
+      }
+    case 'error':
+    case 'loading':
+      return { size: undefined, status: action.type, url: undefined }
+  }
+}
+
 const Viewer = () => {
   const { setVisible, visible } = useTrafficLight()
 
-  const { image, status: fetchStatus } = useImage()
+  const { image, status: fetchStatus, zoom, zoomBy } = useImage()
 
   const { dropping, ...dropHandlers } = useDrop()
 
@@ -28,12 +57,32 @@ const Viewer = () => {
     x: number
     y: number
   }>()
-  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(
-    'loading',
-  )
+  const [{ size: nativeSize, status, url }, dispatch] = useReducer(reducer, {
+    size: undefined,
+    status: 'loading',
+    url: undefined,
+  })
+  const [wrapperSize, setWrapperSize] = useState<{
+    height: number
+    width: number
+  }>()
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const timer = useRef<number>()
+
+  const size = useMemo(() => {
+    if (!nativeSize || !wrapperSize) {
+      return undefined
+    }
+    const { height, width } = nativeSize
+    const { height: wrapperHeight, width: wrapperWidth } = wrapperSize
+    const ratio =
+      Math.min(1, Math.min(wrapperHeight / height, wrapperWidth / width)) * zoom
+    return {
+      height: height * ratio,
+      width: width * ratio,
+    }
+  }, [nativeSize, wrapperSize, zoom])
 
   useEffect(
     () => setVisible(controlBarVisible),
@@ -41,27 +90,50 @@ const Viewer = () => {
   )
 
   useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) {
+      return
+    }
+    const handleResize = (entries: ResizeObserverEntry[]) => {
+      const entry = entries[0]
+      if (entry) {
+        const { height, width } = entry.contentRect
+        setWrapperSize({ height, width })
+      }
+    }
+    const observer = new ResizeObserver(handleResize)
+    observer.observe(wrapper)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     ;(async () => {
-      setStatus('loading')
-      const success = await (async () => {
-        if (!image?.url) {
-          return true
-        }
+      if (!image) {
+        return
+      }
+      const size = await (async () => {
         try {
-          await new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => resolve(undefined)
-            img.onerror = (e) => reject(e)
-            img.src = image.url
-          })
-          return true
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+          return await new Promise<{ height: number; width: number }>(
+            (resolve, reject) => {
+              const img = new Image()
+              img.onload = () =>
+                resolve({ height: img.height, width: img.width })
+              img.onerror = (e) => reject(e)
+              img.src = image.url
+            },
+          )
         } catch (e) {
-          return false
+          return undefined
         }
       })()
-      setStatus(success ? 'loaded' : 'error')
+      if (size) {
+        dispatch({ type: 'loaded', payload: { size, url: image.url } })
+      } else {
+        dispatch({ type: 'error' })
+      }
     })()
-  }, [image?.url])
+  }, [image])
 
   const message = useMemo(() => {
     switch (fetchStatus) {
@@ -144,6 +216,15 @@ const Viewer = () => {
     }
   }, [])
 
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+        zoomBy(e.deltaY * 0.01)
+      }
+    },
+    [zoomBy],
+  )
+
   const handleMouseEnterBar = useCallback(() => {
     setHovered(true)
     resetTimer(true)
@@ -156,18 +237,18 @@ const Viewer = () => {
 
   return (
     <Box
-      onMouseDown={handleMouseDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
       sx={{ height: '100%', width: '100%' }}
-      {...dropHandlers}
     >
       <Box
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onWheel={handleWheel}
         ref={wrapperRef}
         sx={{
-          alignItems: 'center',
+          alignItems: 'safe center',
           cursor: dragOffset
             ? 'grabbing'
             : controlBarVisible
@@ -175,23 +256,24 @@ const Viewer = () => {
               : 'none',
           display: 'flex',
           height: '100%',
-          justifyContent: 'center',
+          justifyContent: 'safe center',
           overflow: 'auto',
           width: '100%',
           '::-webkit-scrollbar': {
             display: 'none',
           },
         }}
+        {...dropHandlers}
       >
-        {status === 'loaded' && image && (
+        {status === 'loaded' && url && size && (
           <img
-            src={image.url}
+            src={url}
             style={{
               background: 'black',
               display: 'block',
-              maxHeight: '100%',
-              maxWidth: '100%',
+              height: size.height,
               pointerEvents: 'none',
+              width: size.width,
             }}
           />
         )}

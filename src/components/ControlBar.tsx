@@ -95,16 +95,18 @@ const ControlBar = () => {
         >
           <KeyboardArrowRightIcon fontSize="small" />
         </IconButton>
-        <Typography
-          noWrap
-          sx={{
-            flexShrink: 0,
-            mx: 1,
-          }}
-          variant="body2"
-        >
-          {index + 1} / {images.length}
-        </Typography>
+        {index !== undefined && (
+          <Typography
+            noWrap
+            sx={{
+              flexShrink: 0,
+              mx: 1,
+            }}
+            variant="body2"
+          >
+            {index + 1} / {images.length}
+          </Typography>
+        )}
         {image && (
           <Typography noWrap variant="body2">
             ・ {image.name}

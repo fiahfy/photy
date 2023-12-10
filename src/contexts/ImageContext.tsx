@@ -19,7 +19,7 @@ export const ImageContext = createContext<
       fullscreen: boolean
       image: File | undefined
       images: File[]
-      index: number
+      index: number | undefined
       movePrevious: () => void
       moveNext: () => void
       moveTo: (index: number) => void
@@ -76,14 +76,17 @@ export const ImageProvider = (props: Props) => {
     entries: [],
     status: 'loading',
   })
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState<number>()
 
   const images = useMemo(
     () => entries.filter((entry) => isImageFile(entry.path)),
     [entries],
   )
 
-  const image = useMemo(() => images[index], [images, index])
+  const image = useMemo(
+    () => (index ? images[index] : undefined),
+    [images, index],
+  )
 
   useEffect(() => {
     const removeListener =
@@ -127,12 +130,24 @@ export const ImageProvider = (props: Props) => {
   const resetZoom = useCallback(() => setZoom(1), [])
 
   const movePrevious = useCallback(
-    () => setIndex((index) => (index <= 0 ? images.length - 1 : index - 1)),
+    () =>
+      setIndex((index) => {
+        if (index === undefined) {
+          return index
+        }
+        return index <= 0 ? images.length - 1 : index - 1
+      }),
     [images.length],
   )
 
   const moveNext = useCallback(
-    () => setIndex((index) => (index >= images.length - 1 ? 0 : index + 1)),
+    () =>
+      setIndex((index) => {
+        if (index === undefined) {
+          return index
+        }
+        return index >= images.length - 1 ? 0 : index + 1
+      }),
     [images.length],
   )
 

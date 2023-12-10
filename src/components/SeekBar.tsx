@@ -65,51 +65,53 @@ const SeekBar = (props: Props) => {
             ...transitionStyles[state],
           }}
         >
-          <Slider
-            max={images.length}
-            min={1}
-            onChange={handleChange}
-            onKeyDown={(e) => e.preventDefault()}
-            size="small"
-            step={1}
-            sx={{
-              borderRadius: 0,
-              inset: 0,
-              position: 'absolute',
-              width: 'auto',
-              '.MuiSlider-thumb': {
-                transform: 'translate(-50%, -50%) scale(0)',
-                transition: 'none',
-                '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-                  boxShadow: 'inherit',
-                },
-                '.MuiSlider-valueLabel': {
-                  backgroundColor: 'transparent',
-                  opacity: 0,
-                  transition: 'opacity 0.2s ease-in-out',
-                  '::before': {
-                    display: 'none',
+          {index !== undefined && (
+            <Slider
+              max={images.length}
+              min={1}
+              onChange={handleChange}
+              onKeyDown={(e) => e.preventDefault()}
+              size="small"
+              step={1}
+              sx={{
+                borderRadius: 0,
+                inset: 0,
+                position: 'absolute',
+                width: 'auto',
+                '.MuiSlider-thumb': {
+                  transform: 'translate(-50%, -50%) scale(0)',
+                  transition: 'none',
+                  '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+                    boxShadow: 'inherit',
+                  },
+                  '.MuiSlider-valueLabel': {
+                    backgroundColor: 'transparent',
+                    opacity: 0,
+                    transition: 'opacity 0.2s ease-in-out',
+                    '::before': {
+                      display: 'none',
+                    },
+                  },
+                  '.MuiSlider-valueLabelOpen': {
+                    opacity: 1,
                   },
                 },
-                '.MuiSlider-valueLabelOpen': {
-                  opacity: 1,
-                },
-              },
-              '.MuiSlider-rail, .MuiSlider-track': {
-                transition: 'transform 0.2s ease-in-out',
-              },
-              '&:hover': {
-                '.MuiSlider-thumb': {
-                  transform: 'translate(-50%, -50%) scale(1)',
-                },
                 '.MuiSlider-rail, .MuiSlider-track': {
-                  transform: 'translate(0, -50%) scale(1, 1.5)',
+                  transition: 'transform 0.2s ease-in-out',
                 },
-              },
-            }}
-            value={index + 1}
-            valueLabelDisplay="auto"
-          />
+                '&:hover': {
+                  '.MuiSlider-thumb': {
+                    transform: 'translate(-50%, -50%) scale(1)',
+                  },
+                  '.MuiSlider-rail, .MuiSlider-track': {
+                    transform: 'translate(0, -50%) scale(1, 1.5)',
+                  },
+                },
+              }}
+              value={index + 1}
+              valueLabelDisplay="auto"
+            />
+          )}
         </Box>
       )}
     </Transition>
