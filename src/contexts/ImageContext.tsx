@@ -84,7 +84,7 @@ export const ImageProvider = (props: Props) => {
   )
 
   const image = useMemo(
-    () => (index ? images[index] : undefined),
+    () => (index !== undefined ? images[index] : undefined),
     [images, index],
   )
 

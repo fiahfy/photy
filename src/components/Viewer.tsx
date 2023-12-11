@@ -113,7 +113,6 @@ const Viewer = () => {
       }
       const size = await (async () => {
         try {
-          await new Promise((resolve) => setTimeout(resolve, 1000))
           return await new Promise<{ height: number; width: number }>(
             (resolve, reject) => {
               const img = new Image()
