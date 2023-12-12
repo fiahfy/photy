@@ -1,7 +1,6 @@
 import { Box, Fade, Typography } from '@mui/material'
 import {
   MouseEvent,
-  WheelEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -15,6 +14,7 @@ import SeekBar from '~/components/SeekBar'
 import TitleBar from '~/components/TitleBar'
 import useDrop from '~/hooks/useDrop'
 import useImage from '~/hooks/useImage'
+import usePrevious from '~/hooks/usePrevious'
 import useTrafficLight from '~/hooks/useTrafficLight'
 
 type State = {
@@ -66,6 +66,7 @@ const Viewer = () => {
     height: number
     width: number
   }>()
+  const [position, setPosition] = useState<{ x: number; y: number }>()
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const timer = useRef<number>()
@@ -83,6 +84,8 @@ const Viewer = () => {
       width: width * ratio,
     }
   }, [nativeSize, wrapperSize, zoom])
+
+  const previousSize = usePrevious(size)
 
   useEffect(
     () => setVisible(controlBarVisible),
@@ -105,6 +108,40 @@ const Viewer = () => {
     observer.observe(wrapper)
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) {
+      return
+    }
+    const handleWheel = (e: WheelEvent) => {
+      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
+        e.preventDefault()
+        setPosition({ x: e.clientX, y: e.clientY })
+        zoomBy(e.deltaY * 0.01)
+      }
+    }
+    wrapper.addEventListener('wheel', handleWheel, { passive: false })
+    return () => wrapper.removeEventListener('wheel', handleWheel)
+  }, [zoomBy])
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) {
+      return
+    }
+    if (!position || !previousSize || !size) {
+      return
+    }
+    const left =
+      ((wrapper.scrollLeft + position.x) / previousSize.width) * size.width -
+      position.x
+    const top =
+      ((wrapper.scrollTop + position.y) / previousSize.height) * size.height -
+      position.y
+    wrapper.scrollLeft = left
+    wrapper.scrollTop = top
+  }, [position, previousSize, size])
 
   useEffect(() => {
     ;(async () => {
@@ -215,15 +252,6 @@ const Viewer = () => {
     }
   }, [])
 
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        zoomBy(e.deltaY * 0.01)
-      }
-    },
-    [zoomBy],
-  )
-
   const handleMouseEnterBar = useCallback(() => {
     setHovered(true)
     resetTimer(true)
@@ -244,7 +272,6 @@ const Viewer = () => {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onWheel={handleWheel}
         ref={wrapperRef}
         sx={{
           alignItems: 'safe center',
