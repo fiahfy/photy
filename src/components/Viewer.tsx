@@ -139,8 +139,7 @@ const Viewer = () => {
     const top =
       ((wrapper.scrollTop + position.y) / previousSize.height) * size.height -
       position.y
-    wrapper.scrollLeft = left
-    wrapper.scrollTop = top
+    wrapper.scrollTo({ left, top })
   }, [position, previousSize, size])
 
   useEffect(() => {
