@@ -17,8 +17,8 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    replaceState(_state, action: PayloadAction<State>) {
-      return action.payload
+    replaceState(_state, action: PayloadAction<{ state: State }>) {
+      return action.payload.state
     },
     setViewModeOnOpen(
       state,
