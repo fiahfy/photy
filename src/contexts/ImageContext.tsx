@@ -109,7 +109,10 @@ export const ImageProvider = (props: Props) => {
 
   useEffect(() => {
     const index = images.findIndex((entry) => entry.path === file.path)
-    setIndex(index === -1 ? 0 : index)
+    if (index === -1) {
+      return
+    }
+    setIndex(index)
   }, [file.path, images])
 
   const toggleFullscreen = useCallback(
