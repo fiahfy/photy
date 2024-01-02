@@ -19,7 +19,8 @@ const App = () => {
   )
   const dispatch = useAppDispatch()
 
-  const { directory, moveNext, movePrevious } = useImage()
+  const { directory, moveNext, movePrevious, resetZoom, zoomIn, zoomOut } =
+    useImage()
 
   useTitle(directory?.name ?? '')
 
@@ -29,6 +30,8 @@ const App = () => {
       switch (type) {
         case 'changeFile':
           return dispatch(newWindow(data.file))
+        case 'resetZoom':
+          return resetZoom()
         case 'setViewModeOnOpen':
           return dispatch(
             setViewModeOnOpen({ viewModeOnOpen: data.viewModeOnOpen }),
@@ -39,10 +42,14 @@ const App = () => {
           return dispatch(toggleShouldAlwaysShowSeekBar())
         case 'toggleShouldCloseWindowOnEscapeKey':
           return dispatch(toggleShouldCloseWindowOnEscapeKey())
+        case 'zoomIn':
+          return zoomIn()
+        case 'zoomOut':
+          return zoomOut()
       }
     })
     return () => removeListener()
-  }, [dispatch])
+  }, [dispatch, resetZoom, zoomIn, zoomOut])
 
   useEffect(() => {
     const handler = () => window.electronAPI.updateApplicationMenu({})

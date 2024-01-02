@@ -117,7 +117,6 @@ const Viewer = () => {
     const handleWheel = (e: WheelEvent) => {
       if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
         e.preventDefault()
-        setPosition({ x: e.clientX, y: e.clientY })
         zoomBy(e.deltaY * 0.01)
       }
     }
@@ -222,6 +221,7 @@ const Viewer = () => {
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY })
       resetTimer(hovered)
       const wrapper = wrapperRef.current
       if (wrapper && dragOffset) {
