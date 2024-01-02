@@ -47,7 +47,7 @@ const reducer = (_state: State, action: Action) => {
 const Viewer = () => {
   const { setVisible, visible } = useTrafficLight()
 
-  const { image, status: fetchStatus, zoom, zoomBy } = useImage()
+  const { image, status: fetchStatus, resetZoom, zoom, zoomBy } = useImage()
 
   const { dropping, ...dropHandlers } = useDrop()
 
@@ -115,10 +115,8 @@ const Viewer = () => {
       return
     }
     const handleWheel = (e: WheelEvent) => {
-      if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-        e.preventDefault()
-        zoomBy(e.deltaY * 0.01)
-      }
+      e.preventDefault()
+      zoomBy(e.deltaY * 0.01)
     }
     wrapper.addEventListener('wheel', handleWheel, { passive: false })
     return () => wrapper.removeEventListener('wheel', handleWheel)
@@ -161,13 +159,14 @@ const Viewer = () => {
           return undefined
         }
       })()
+      resetZoom()
       if (size) {
         dispatch({ type: 'loaded', payload: { size, url: image.url } })
       } else {
         dispatch({ type: 'error' })
       }
     })()
-  }, [image])
+  }, [image, resetZoom])
 
   const message = useMemo(() => {
     switch (fetchStatus) {
@@ -208,14 +207,12 @@ const Viewer = () => {
   }, [hovered, resetTimer])
 
   const handleMouseDown = useCallback((e: MouseEvent) => {
-    if ((e.ctrlKey && !e.metaKey) || (!e.ctrlKey && e.metaKey)) {
-      const wrapper = wrapperRef.current
-      if (wrapper) {
-        setDragOffset({
-          x: wrapper.scrollLeft + e.clientX,
-          y: wrapper.scrollTop + e.clientY,
-        })
-      }
+    const wrapper = wrapperRef.current
+    if (wrapper) {
+      setDragOffset({
+        x: wrapper.scrollLeft + e.clientX,
+        y: wrapper.scrollTop + e.clientY,
+      })
     }
   }, [])
 
@@ -274,11 +271,7 @@ const Viewer = () => {
         ref={wrapperRef}
         sx={{
           alignItems: 'safe center',
-          cursor: dragOffset
-            ? 'grabbing'
-            : controlBarVisible
-              ? undefined
-              : 'none',
+          cursor: dragOffset ? 'grabbing' : controlBarVisible ? 'grab' : 'none',
           display: 'flex',
           height: '100%',
           justifyContent: 'safe center',
