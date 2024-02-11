@@ -1,7 +1,7 @@
 {
   "name": "photy",
   "description": "Simple Image Viewer based on Electron.",
-  "version": "0.0.1-dev",
+  "version": "0.0.1",
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
