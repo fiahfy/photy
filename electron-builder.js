@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const imageExtensions = require('image-extensions')
 
 module.exports = {

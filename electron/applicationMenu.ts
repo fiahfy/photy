@@ -21,9 +21,7 @@ const send = (message: any) => {
   activeWindow?.webContents.send('sendMessage', message)
 }
 
-const registerApplicationMenu = (
-  createWindow: (filePath: string) => Promise<void>,
-) => {
+const registerApplicationMenu = (createWindow: (filePath: string) => void) => {
   const isMac = process.platform === 'darwin'
 
   let state: State = {}
