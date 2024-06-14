@@ -1,10 +1,12 @@
 import {
   ReactNode,
+  RefObject,
   createContext,
   useCallback,
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react'
 import { useAppSelector } from '~/store'
@@ -20,10 +22,13 @@ export const ImageContext = createContext<
       image: File | undefined
       images: File[]
       index: number | undefined
-      movePrevious: () => void
+      message: string | undefined
       moveNext: () => void
+      movePrevious: () => void
       moveTo: (index: number) => void
+      ref: RefObject<HTMLImageElement>
       resetZoom: () => void
+      size: { height: number; width: number } | undefined
       status: 'loading' | 'loaded' | 'error'
       toggleFullscreen: () => void
       zoom: number
@@ -34,13 +39,13 @@ export const ImageContext = createContext<
   | undefined
 >(undefined)
 
-type State = {
+type DirectoryState = {
   directory: File | undefined
   entries: File[]
   status: 'error' | 'loaded' | 'loading'
 }
 
-type Action =
+type DirectoryAction =
   | { type: 'error' }
   | {
       type: 'loaded'
@@ -48,7 +53,7 @@ type Action =
     }
   | { type: 'loading' }
 
-const reducer = (_state: State, action: Action) => {
+const directoryReducer = (_state: DirectoryState, action: DirectoryAction) => {
   switch (action.type) {
     case 'loaded':
       return {
@@ -58,6 +63,32 @@ const reducer = (_state: State, action: Action) => {
     case 'error':
     case 'loading':
       return { directory: undefined, entries: [], status: action.type }
+  }
+}
+
+type FileState = {
+  size: { height: number; width: number } | undefined
+  status: 'error' | 'loaded' | 'loading'
+}
+
+type FileAction =
+  | { type: 'error' }
+  | {
+      type: 'loaded'
+      payload: { size: { height: number; width: number } }
+    }
+  | { type: 'loading' }
+
+const fileReducer = (_state: FileState, action: FileAction) => {
+  switch (action.type) {
+    case 'loaded':
+      return {
+        ...action.payload,
+        status: action.type,
+      }
+    case 'error':
+    case 'loading':
+      return { size: undefined, status: action.type }
   }
 }
 
@@ -71,22 +102,46 @@ export const ImageProvider = (props: Props) => {
   const [fullscreen, setFullscreen] = useState(false)
   const [zoom, setZoom] = useState(1)
 
-  const [{ directory, entries, status }, dispatch] = useReducer(reducer, {
-    directory: undefined,
-    entries: [],
+  const [{ directory, entries, status: directoryStatus }, directoryDispatch] =
+    useReducer(directoryReducer, {
+      directory: undefined,
+      entries: [],
+      status: 'loading',
+    })
+  const [{ size, status: fileStatus }, fileDispatch] = useReducer(fileReducer, {
+    size: undefined,
     status: 'loading',
   })
-  const [index, setIndex] = useState<number>()
 
+  const [index, setIndex] = useState<number>()
   const images = useMemo(
     () => entries.filter((entry) => isImageFile(entry.path)),
     [entries],
   )
-
   const image = useMemo(
     () => (index !== undefined ? images[index] : undefined),
     [images, index],
   )
+
+  const message = useMemo(() => {
+    switch (directoryStatus) {
+      case 'loading':
+        return 'Loading...'
+      case 'error':
+        return 'Failed to load.'
+      default:
+        switch (fileStatus) {
+          case 'loading':
+            return 'Loading...'
+          case 'error':
+            return 'Failed to load.'
+          default:
+            return undefined
+        }
+    }
+  }, [directoryStatus, fileStatus])
+
+  const ref = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
     const removeListener =
@@ -96,13 +151,13 @@ export const ImageProvider = (props: Props) => {
 
   useEffect(() => {
     ;(async () => {
-      dispatch({ type: 'loading' })
+      directoryDispatch({ type: 'loading' })
       try {
         const directory = await window.electronAPI.getParentDirectory(file.path)
         const entries = await window.electronAPI.getEntries(directory.path)
-        dispatch({ type: 'loaded', payload: { directory, entries } })
+        directoryDispatch({ type: 'loaded', payload: { directory, entries } })
       } catch (e) {
-        dispatch({ type: 'error' })
+        directoryDispatch({ type: 'error' })
       }
     })()
   }, [file.path])
@@ -114,6 +169,33 @@ export const ImageProvider = (props: Props) => {
     }
     setIndex(index)
   }, [file.path, images])
+
+  useEffect(() => {
+    const img = ref.current
+    if (!img) {
+      return
+    }
+
+    const handleLoad = () => {
+      setZoom(1)
+      fileDispatch({
+        type: 'loaded',
+        payload: {
+          size: { height: img.naturalHeight, width: img.naturalWidth },
+        },
+      })
+    }
+    const handleError = () => {
+      setZoom(1)
+      fileDispatch({ type: 'error' })
+    }
+    img.addEventListener('load', handleLoad)
+    img.addEventListener('error', handleError)
+    return () => {
+      img.removeEventListener('load', handleLoad)
+      img.removeEventListener('error', handleError)
+    }
+  }, [])
 
   const toggleFullscreen = useCallback(
     () => window.electronAPI.toggleFullscreen(),
@@ -162,11 +244,14 @@ export const ImageProvider = (props: Props) => {
     image,
     images,
     index,
-    movePrevious,
+    message,
     moveNext,
+    movePrevious,
     moveTo,
+    ref,
     resetZoom,
-    status,
+    size,
+    status: fileStatus,
     toggleFullscreen,
     zoom,
     zoomBy,

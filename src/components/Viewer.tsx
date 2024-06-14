@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useReducer,
   useRef,
   useState,
 } from 'react'
@@ -17,37 +16,18 @@ import useImage from '~/hooks/useImage'
 import usePrevious from '~/hooks/usePrevious'
 import useTrafficLight from '~/hooks/useTrafficLight'
 
-type State = {
-  size: { height: number; width: number } | undefined
-  status: 'error' | 'loaded' | 'loading'
-  url: string | undefined
-}
-
-type Action =
-  | { type: 'error' }
-  | {
-      type: 'loaded'
-      payload: { size: { height: number; width: number }; url: string }
-    }
-  | { type: 'loading' }
-
-const reducer = (_state: State, action: Action) => {
-  switch (action.type) {
-    case 'loaded':
-      return {
-        ...action.payload,
-        status: action.type,
-      }
-    case 'error':
-    case 'loading':
-      return { size: undefined, status: action.type, url: undefined }
-  }
-}
-
 const Viewer = () => {
   const { setVisible, visible } = useTrafficLight()
 
-  const { image, status: fetchStatus, resetZoom, zoom, zoomBy } = useImage()
+  const {
+    image,
+    message,
+    ref,
+    size: nativeSize,
+    status,
+    zoom,
+    zoomBy,
+  } = useImage()
 
   const { dropping, ...dropHandlers } = useDrop()
 
@@ -57,11 +37,6 @@ const Viewer = () => {
     x: number
     y: number
   }>()
-  const [{ size: nativeSize, status, url }, dispatch] = useReducer(reducer, {
-    size: undefined,
-    status: 'loading',
-    url: undefined,
-  })
   const [wrapperSize, setWrapperSize] = useState<{
     height: number
     width: number
@@ -138,53 +113,6 @@ const Viewer = () => {
       position.y
     wrapper.scrollTo({ left, top })
   }, [position, previousSize, size])
-
-  useEffect(() => {
-    ;(async () => {
-      if (!image) {
-        return
-      }
-      const size = await (async () => {
-        try {
-          return await new Promise<{ height: number; width: number }>(
-            (resolve, reject) => {
-              const img = new Image()
-              img.onload = () =>
-                resolve({ height: img.height, width: img.width })
-              img.onerror = (e) => reject(e)
-              img.src = image.url
-            },
-          )
-        } catch (e) {
-          return undefined
-        }
-      })()
-      resetZoom()
-      if (size) {
-        dispatch({ type: 'loaded', payload: { size, url: image.url } })
-      } else {
-        dispatch({ type: 'error' })
-      }
-    })()
-  }, [image, resetZoom])
-
-  const message = useMemo(() => {
-    switch (fetchStatus) {
-      case 'loading':
-        return 'Loading...'
-      case 'error':
-        return 'Failed to load.'
-      default:
-        switch (status) {
-          case 'loading':
-            return 'Loading...'
-          case 'error':
-            return 'Failed to load.'
-          default:
-            return undefined
-        }
-    }
-  }, [fetchStatus, status])
 
   const clearTimer = useCallback(() => window.clearTimeout(timer.current), [])
 
@@ -283,18 +211,16 @@ const Viewer = () => {
         }}
         {...dropHandlers}
       >
-        {status === 'loaded' && url && size && (
-          <img
-            src={url}
-            style={{
-              background: 'black',
-              display: 'block',
-              height: size.height,
-              pointerEvents: 'none',
-              width: size.width,
-            }}
-          />
-        )}
+        <img
+          ref={ref}
+          src={image?.url}
+          style={{
+            background: 'black',
+            display: status === 'loaded' ? 'block' : 'none',
+            pointerEvents: 'none',
+            ...(size ? { ...size } : {}),
+          }}
+        />
       </Box>
       <Box
         sx={{
