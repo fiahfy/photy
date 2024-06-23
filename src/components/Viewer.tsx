@@ -52,8 +52,7 @@ const Viewer = () => {
     }
     const { height, width } = nativeSize
     const { height: wrapperHeight, width: wrapperWidth } = wrapperSize
-    const ratio =
-      Math.min(1, Math.min(wrapperHeight / height, wrapperWidth / width)) * zoom
+    const ratio = Math.min(wrapperHeight / height, wrapperWidth / width) * zoom
     return {
       height: height * ratio,
       width: width * ratio,
