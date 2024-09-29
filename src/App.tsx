@@ -77,9 +77,8 @@ const App = () => {
           e.preventDefault()
           if (shouldCloseWindowOnEscapeKey) {
             return await window.electronAPI.closeWindow()
-          } else {
-            return await window.electronAPI.exitFullscreen()
           }
+          return await window.electronAPI.exitFullscreen()
         case 'f':
           e.preventDefault()
           return await window.electronAPI.toggleFullscreen()

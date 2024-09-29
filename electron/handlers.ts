@@ -1,4 +1,4 @@
-import { IpcMainInvokeEvent, ipcMain } from 'electron'
+import { type IpcMainInvokeEvent, ipcMain } from 'electron'
 import { readdir } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
