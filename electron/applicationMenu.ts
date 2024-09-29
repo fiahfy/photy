@@ -10,10 +10,12 @@ import {
 } from 'electron'
 import imageExtensions from 'image-extensions'
 
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
 type State = {}
 
 export type ApplicationMenuParams = Partial<State>
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const send = (message: any) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
   activeWindow?.webContents.send('sendMessage', message)

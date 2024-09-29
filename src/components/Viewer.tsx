@@ -210,6 +210,7 @@ const Viewer = () => {
         }}
         {...dropHandlers}
       >
+        {/* biome-ignore lint/a11y/useAltText: <explanation> */}
         <img
           ref={ref}
           src={image?.url}

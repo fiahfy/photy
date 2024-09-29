@@ -36,14 +36,12 @@ const registerHandlers = () => {
       const dirents = await readdir(directoryPath, { withFileTypes: true })
       return dirents.reduce((acc, dirent) => {
         const path = join(directoryPath, dirent.name)
-        return [
-          ...acc,
-          {
-            name: dirent.name.normalize('NFC'),
-            path,
-            url: pathToFileURL(path).href,
-          },
-        ]
+        acc.push({
+          name: dirent.name.normalize('NFC'),
+          path,
+          url: pathToFileURL(path).href,
+        })
+        return acc
       }, [] as Entry[])
     },
   )
