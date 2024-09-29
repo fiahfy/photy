@@ -1,7 +1,5 @@
 import {
   type ReactNode,
-  type RefObject,
-  createContext,
   useCallback,
   useEffect,
   useMemo,
@@ -9,35 +7,10 @@ import {
   useRef,
   useState,
 } from 'react'
+import ImageContext, { type File } from '~/contexts/ImageContext'
 import { useAppSelector } from '~/store'
 import { selectFile } from '~/store/window'
 import { isImageFile } from '~/utils/file'
-
-type File = { name: string; path: string; url: string }
-
-export const ImageContext = createContext<
-  | {
-      directory: File | undefined
-      fullscreen: boolean
-      image: File | undefined
-      images: File[]
-      index: number | undefined
-      message: string | undefined
-      moveNext: () => void
-      movePrevious: () => void
-      moveTo: (index: number) => void
-      ref: RefObject<HTMLImageElement>
-      resetZoom: () => void
-      size: { height: number; width: number } | undefined
-      status: 'loading' | 'loaded' | 'error'
-      toggleFullscreen: () => void
-      zoom: number
-      zoomBy: (value: number) => void
-      zoomIn: () => void
-      zoomOut: () => void
-    }
-  | undefined
->(undefined)
 
 type DirectoryState = {
   directory: File | undefined
@@ -94,7 +67,7 @@ const fileReducer = (_state: FileState, action: FileAction) => {
 
 type Props = { children: ReactNode }
 
-export const ImageProvider = (props: Props) => {
+const ImageProvider = (props: Props) => {
   const { children } = props
 
   const file = useAppSelector(selectFile)
@@ -261,3 +234,5 @@ export const ImageProvider = (props: Props) => {
 
   return <ImageContext.Provider value={value}>{children}</ImageContext.Provider>
 }
+
+export default ImageProvider

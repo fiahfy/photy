@@ -5,10 +5,10 @@ import '@fontsource/roboto/700.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '~/App'
-import { ImageProvider } from '~/contexts/ImageContext'
-import { StoreProvider } from '~/contexts/StoreContext'
-import { ThemeProvider } from '~/contexts/ThemeContext'
-import { TrafficLightProvider } from '~/contexts/TrafficLightContext'
+import ImageProvider from '~/providers/ImageProvider'
+import StoreProvider from '~/providers/StoreProvider'
+import ThemeProvider from '~/providers/ThemeProvider'
+import TrafficLightProvider from '~/providers/TrafficLightProvider'
 
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
 ReactDOM.createRoot(document.getElementById('root')!).render(
