@@ -20,6 +20,7 @@ const Viewer = () => {
   const { setVisible, visible } = useTrafficLight()
 
   const {
+    fullscreen,
     image,
     message,
     ref,
@@ -62,8 +63,8 @@ const Viewer = () => {
   const previousSize = usePrevious(size)
 
   useEffect(
-    () => setVisible(controlBarVisible),
-    [controlBarVisible, setVisible],
+    () => setVisible(fullscreen || controlBarVisible),
+    [fullscreen, controlBarVisible, setVisible],
   )
 
   useEffect(() => {
