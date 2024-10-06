@@ -1,6 +1,11 @@
 import { exposeOperations as exposeContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
 import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
-import { type IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+import {
+  type IpcRendererEvent,
+  contextBridge,
+  ipcRenderer,
+  webUtils,
+} from 'electron'
 import type { ApplicationMenuParams } from './applicationMenu'
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -16,7 +21,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('getEntries', directoryPath),
   getParentDirectory: (filePath: string) =>
     ipcRenderer.invoke('getParentDirectory', filePath),
-  openFile: (filePath: string) => ipcRenderer.invoke('openFile', filePath),
+  openFile: (file: File) =>
+    ipcRenderer.invoke('openFile', webUtils.getPathForFile(file)),
   updateApplicationMenu: (params: ApplicationMenuParams) =>
     ipcRenderer.invoke('updateApplicationMenu', params),
   ...exposeContextMenuOperations(),

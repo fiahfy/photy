@@ -13,7 +13,7 @@ export type IElectronAPI = {
   addMessageListener: (callback: (message: any) => void) => () => void
   getEntries: (directoryPath: string) => Promise<File[]>
   getParentDirectory: (filePath: string) => Promise<File>
-  openFile: (filePath: string) => Promise<void>
+  openFile: (file: globalThis.File) => Promise<void>
   updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
 } & ContextMenuOperations &
   WindowOperations<{ file: File }>
