@@ -13,7 +13,7 @@ const ImageContext = createContext<
       moveNext: () => void
       movePrevious: () => void
       moveTo: (index: number) => void
-      ref: RefObject<HTMLImageElement>
+      ref: RefObject<HTMLImageElement | null>
       resetZoom: () => void
       size: { height: number; width: number } | undefined
       status: 'loading' | 'loaded' | 'error'

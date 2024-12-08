@@ -45,7 +45,7 @@ const Viewer = () => {
   const [position, setPosition] = useState<{ x: number; y: number }>()
 
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const timer = useRef<number>()
+  const timer = useRef(0)
 
   const size = useMemo(() => {
     if (!nativeSize || !wrapperSize) {
