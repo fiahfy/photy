@@ -1,7 +1,7 @@
 import { readdir } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { type IpcMainInvokeEvent, ipcMain } from 'electron'
+import { type IpcMainInvokeEvent, ipcMain, screen } from 'electron'
 
 type Entry = {
   name: string
@@ -10,6 +10,9 @@ type Entry = {
 }
 
 const registerHandlers = () => {
+  ipcMain.handle('getCursorPosition', (_event: IpcMainInvokeEvent) =>
+    screen.getCursorScreenPoint(),
+  )
   ipcMain.handle('openFile', (event: IpcMainInvokeEvent, filePath: string) => {
     const file = {
       name: basename(filePath),

@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('sendMessage', listener)
     return () => ipcRenderer.off('sendMessage', listener)
   },
+  getCursorPosition: () => ipcRenderer.invoke('getCursorPosition'),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('getEntries', directoryPath),
   getParentDirectory: (filePath: string) =>

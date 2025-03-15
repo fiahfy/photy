@@ -11,6 +11,7 @@ type File = { name: string; path: string; url: string }
 export type IElectronAPI = {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   addMessageListener: (callback: (message: any) => void) => () => void
+  getCursorPosition: () => Promise<{ x: number; y: number }>
   getEntries: (directoryPath: string) => Promise<File[]>
   getParentDirectory: (filePath: string) => Promise<File>
   openFile: (file: globalThis.File) => Promise<void>
