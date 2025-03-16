@@ -117,8 +117,7 @@ const ImageProvider = (props: Props) => {
   const ref = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
-    const removeListener =
-      window.electronAPI.addFullscreenListener(setFullscreen)
+    const removeListener = window.electronAPI.onFullscreenChange(setFullscreen)
     return () => removeListener()
   }, [])
 

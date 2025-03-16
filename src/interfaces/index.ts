@@ -9,11 +9,11 @@ import type { Operations as WindowOperations } from '@fiahfy/electron-window/pre
 type File = { name: string; path: string; url: string }
 
 export type IElectronAPI = {
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  addMessageListener: (callback: (message: any) => void) => () => void
   getCursorPosition: () => Promise<{ x: number; y: number }>
   getEntries: (directoryPath: string) => Promise<File[]>
   getParentDirectory: (filePath: string) => Promise<File>
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  onMessage: (callback: (message: any) => void) => () => void
   openFile: (file: globalThis.File) => Promise<void>
   updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
 } & ContextMenuOperations &
