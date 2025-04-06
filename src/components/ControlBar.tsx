@@ -14,7 +14,7 @@ import {
   selectShouldCloseWindowOnEscapeKey,
   selectViewModeOnOpen,
 } from '~/store/settings'
-import { createContextMenuHandler } from '~/utils/contextMenu'
+import { createContextMenuHandler } from '~/utils/context-menu'
 
 const ControlBar = () => {
   const shouldAlwaysShowSeekBar = useAppSelector(selectShouldAlwaysShowSeekBar)
