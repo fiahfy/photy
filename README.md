@@ -10,8 +10,6 @@
 
 ## TODOs
 
-- [ ] Use Electron Forge
-
 ## Screenshots
 
 ![screenshot](.github/img/screenshot.png)
@@ -33,6 +31,7 @@ yarn dev
 
 ## References
 
+- https://github.com/electron/forge/tree/main/packages/external/create-electron-app
 - https://github.com/electron-vite/create-electron-vite
 - https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts
 - https://github.com/mui/material-ui/tree/master/examples/material-ui-vite-ts
