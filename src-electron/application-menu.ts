@@ -1,21 +1,21 @@
 import {
+  app,
   BrowserWindow,
+  dialog,
   type IpcMainInvokeEvent,
+  ipcMain,
   Menu,
   type MenuItemConstructorOptions,
-  app,
-  dialog,
-  ipcMain,
   shell,
 } from 'electron'
 import imageExtensions from 'image-extensions'
 
-// biome-ignore lint/complexity/noBannedTypes: <explanation>
+// biome-ignore lint/complexity/noBannedTypes: false positive
 type State = {}
 
 export type ApplicationMenuParams = Partial<State>
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: false positive
 const send = (message: any) => {
   const activeWindow = BrowserWindow.getFocusedWindow()
   activeWindow?.webContents.send('onMessage', message)

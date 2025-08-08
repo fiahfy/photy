@@ -12,12 +12,12 @@ export type IElectronAPI = {
   getCursorPosition: () => Promise<{ x: number; y: number }>
   getEntries: (directoryPath: string) => Promise<File[]>
   getParentDirectory: (filePath: string) => Promise<File>
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: false positive
   onMessage: (callback: (message: any) => void) => () => void
   openFile: (file: globalThis.File) => Promise<void>
   updateApplicationMenu: (params: ApplicationMenuParams) => Promise<void>
 } & ContextMenuOperations &
   WindowOperations<{ file: File }>
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: false positive
 export type ApplicationMenuParams = any

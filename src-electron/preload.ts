@@ -1,8 +1,8 @@
 import { exposeOperations as exposeContextMenuOperations } from '@fiahfy/electron-context-menu/preload'
 import { exposeOperations as exposeWindowOperations } from '@fiahfy/electron-window/preload'
 import {
-  type IpcRendererEvent,
   contextBridge,
+  type IpcRendererEvent,
   ipcRenderer,
   webUtils,
 } from 'electron'
@@ -14,9 +14,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('getEntries', directoryPath),
   getParentDirectory: (filePath: string) =>
     ipcRenderer.invoke('getParentDirectory', filePath),
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: false positive
   onMessage: (callback: (message: any) => void) => {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: false positive
     const listener = (_event: IpcRendererEvent, message: any) =>
       callback(message)
     ipcRenderer.on('onMessage', listener)

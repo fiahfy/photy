@@ -1,6 +1,7 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import useImage from '~/hooks/useImage'
+
 type Props = {
   onMouseEnter: () => void
   onMouseLeave: () => void

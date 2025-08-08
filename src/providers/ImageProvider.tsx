@@ -128,7 +128,7 @@ const ImageProvider = (props: Props) => {
         const directory = await window.electronAPI.getParentDirectory(file.path)
         const entries = await window.electronAPI.getEntries(directory.path)
         directoryDispatch({ type: 'loaded', payload: { directory, entries } })
-      } catch (e) {
+      } catch (_e) {
         directoryDispatch({ type: 'error' })
       }
     })()
