@@ -1,5 +1,5 @@
 import { Box, Slider } from '@mui/material'
-import { useCallback, useMemo, useRef } from 'react'
+import { type KeyboardEvent, useCallback, useMemo, useRef } from 'react'
 import { Transition } from 'react-transition-group'
 import useImage from '~/hooks/useImage'
 import useTheme from '~/hooks/useTheme'
@@ -24,6 +24,11 @@ const SeekBar = (props: Props) => {
     (_e: Event, value: number | number[]) => moveTo((value as number) - 1),
     [moveTo],
   )
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
 
   const timeout = theme.transitions.duration.shortest
 
@@ -70,7 +75,7 @@ const SeekBar = (props: Props) => {
               max={images.length}
               min={1}
               onChange={handleChange}
-              onKeyDown={(e) => e.preventDefault()}
+              onKeyDown={handleKeyDown}
               size="small"
               step={1}
               sx={{

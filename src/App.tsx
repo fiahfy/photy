@@ -61,6 +61,9 @@ const App = () => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault()
+          return movePrevious()
         case 'ArrowLeft':
           e.preventDefault()
           return movePrevious()
@@ -68,9 +71,6 @@ const App = () => {
           e.preventDefault()
           return moveNext()
         case 'ArrowUp':
-          e.preventDefault()
-          return movePrevious()
-        case 'ArrowDown':
           e.preventDefault()
           return moveNext()
         case 'Escape':
