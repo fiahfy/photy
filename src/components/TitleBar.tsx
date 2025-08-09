@@ -1,16 +1,18 @@
 import { AppBar, Toolbar, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import useImage from '~/hooks/useImage'
 
 type Props = {
-  onMouseEnter: () => void
-  onMouseLeave: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
+  title: string
 }
 
 const TitleBar = (props: Props) => {
-  const { onMouseEnter, onMouseLeave } = props
-
-  const { directory } = useImage()
+  const {
+    onMouseEnter = () => undefined,
+    onMouseLeave = () => undefined,
+    title,
+  } = props
 
   const [hovered, setHovered] = useState(false)
 
@@ -41,7 +43,9 @@ const TitleBar = (props: Props) => {
       const top = window.screenY + rect.y
       const bottom = top + rect.height
 
-      setHovered(left <= x && x <= right && top <= y && y <= bottom)
+      const hovered = left <= x && x <= right && top <= y && y <= bottom
+
+      setHovered(hovered)
 
       id = requestAnimationFrame(callback)
     }
@@ -71,11 +75,9 @@ const TitleBar = (props: Props) => {
           px: 8.5,
         }}
       >
-        {directory && (
-          <Typography mt={0.25} noWrap variant="caption">
-            {directory.name}
-          </Typography>
-        )}
+        <Typography mt={0.25} noWrap variant="caption">
+          {title}
+        </Typography>
       </Toolbar>
     </AppBar>
   )
