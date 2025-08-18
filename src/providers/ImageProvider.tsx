@@ -86,7 +86,7 @@ const ImageProvider = (props: Props) => {
     status: 'loading',
   })
 
-  const [index, setIndex] = useState<number>()
+  const [index, setIndex] = useState(0)
   const images = useMemo(
     () => entries.filter((entry) => isImageFile(entry.path)),
     [entries],
@@ -189,9 +189,6 @@ const ImageProvider = (props: Props) => {
   const movePrevious = useCallback(
     () =>
       setIndex((index) => {
-        if (index === undefined) {
-          return index
-        }
         return index <= 0 ? images.length - 1 : index - 1
       }),
     [images.length],
@@ -200,9 +197,6 @@ const ImageProvider = (props: Props) => {
   const moveNext = useCallback(
     () =>
       setIndex((index) => {
-        if (index === undefined) {
-          return index
-        }
         return index >= images.length - 1 ? 0 : index + 1
       }),
     [images.length],
