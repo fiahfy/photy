@@ -27,7 +27,10 @@ const SeekBar = (props: Props) => {
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     e.preventDefault()
-    e.stopPropagation()
+    // Prevent event bubbling
+    if (['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(e.key)) {
+      e.stopPropagation()
+    }
   }, [])
 
   const timeout = theme.transitions.duration.shortest
