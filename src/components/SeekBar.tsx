@@ -25,14 +25,6 @@ const SeekBar = (props: Props) => {
     [moveTo],
   )
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    e.preventDefault()
-    // Prevent event bubbling
-    if (['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(e.key)) {
-      e.stopPropagation()
-    }
-  }, [])
-
   const timeout = theme.transitions.duration.shortest
 
   const styles = useMemo(() => {
@@ -78,8 +70,13 @@ const SeekBar = (props: Props) => {
               max={images.length}
               min={1}
               onChange={handleChange}
-              onKeyDown={handleKeyDown}
               size="small"
+              slotProps={{
+                input: {
+                  // Make slider non-focusable
+                  onFocus: (e) => e.target.blur(),
+                },
+              }}
               step={1}
               sx={{
                 borderRadius: 0,
@@ -116,6 +113,8 @@ const SeekBar = (props: Props) => {
                   },
                 },
               }}
+              // Make slider non-focusable
+              tabIndex={-1}
               value={index + 1}
               valueLabelDisplay="auto"
             />

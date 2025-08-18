@@ -63,7 +63,7 @@ const App = () => {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault()
-          return movePrevious()
+          return moveNext()
         case 'ArrowLeft':
           e.preventDefault()
           return movePrevious()
@@ -72,7 +72,7 @@ const App = () => {
           return moveNext()
         case 'ArrowUp':
           e.preventDefault()
-          return moveNext()
+          return movePrevious()
         case 'Escape':
           e.preventDefault()
           if (shouldCloseWindowOnEscapeKey) {
