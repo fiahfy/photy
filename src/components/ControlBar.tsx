@@ -80,7 +80,6 @@ const ControlBar = () => {
         <IconButton
           disabled={false}
           onClick={movePrevious}
-          onKeyDown={(e) => e.preventDefault()}
           size="small"
           title="Previous Image"
         >
@@ -89,7 +88,6 @@ const ControlBar = () => {
         <IconButton
           disabled={false}
           onClick={moveNext}
-          onKeyDown={(e) => e.preventDefault()}
           size="small"
           title="Next Image"
         >
@@ -118,7 +116,6 @@ const ControlBar = () => {
         </IconButton>
         <IconButton
           onClick={toggleFullscreen}
-          onKeyDown={(e) => e.preventDefault()}
           size="small"
           title={`${fullscreen ? 'Exit full screen' : 'Full screen'} (f)`}
         >
