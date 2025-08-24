@@ -72,9 +72,6 @@ const ImageProvider = (props: Props) => {
 
   const file = useAppSelector(selectFile)
 
-  const [fullscreen, setFullscreen] = useState(false)
-  const [zoom, setZoom] = useState(1)
-
   const [{ directory, entries, status: directoryStatus }, directoryDispatch] =
     useReducer(directoryReducer, {
       directory: undefined,
@@ -86,7 +83,12 @@ const ImageProvider = (props: Props) => {
     status: 'loading',
   })
 
+  const [fullscreen, setFullscreen] = useState(false)
+  const [zoom, setZoom] = useState(1)
   const [index, setIndex] = useState(0)
+
+  const ref = useRef<HTMLImageElement>(null)
+
   const images = useMemo(
     () => entries.filter((entry) => isImageFile(entry.path)),
     [entries],
@@ -95,7 +97,6 @@ const ImageProvider = (props: Props) => {
     () => (index !== undefined ? images[index] : undefined),
     [images, index],
   )
-
   const message = useMemo(() => {
     switch (directoryStatus) {
       case 'loading':
@@ -114,7 +115,40 @@ const ImageProvider = (props: Props) => {
     }
   }, [directoryStatus, fileStatus])
 
-  const ref = useRef<HTMLImageElement>(null)
+  const toggleFullscreen = useCallback(
+    () => window.electronAPI.toggleFullscreen(),
+    [],
+  )
+
+  const zoomBy = useCallback(
+    (value: number) =>
+      setZoom((zoom) => Math.min(Math.max(1, zoom * (1 + value)), 10)),
+    [],
+  )
+
+  const zoomIn = useCallback(() => zoomBy(0.1), [zoomBy])
+
+  const zoomOut = useCallback(() => zoomBy(-0.1), [zoomBy])
+
+  const resetZoom = useCallback(() => setZoom(1), [])
+
+  const movePrevious = useCallback(
+    () =>
+      setIndex((index) => {
+        return index <= 0 ? images.length - 1 : index - 1
+      }),
+    [images.length],
+  )
+
+  const moveNext = useCallback(
+    () =>
+      setIndex((index) => {
+        return index >= images.length - 1 ? 0 : index + 1
+      }),
+    [images.length],
+  )
+
+  const moveTo = useCallback((index: number) => setIndex(index), [])
 
   useEffect(() => {
     const removeListener = window.electronAPI.onFullscreenChange(setFullscreen)
@@ -168,41 +202,6 @@ const ImageProvider = (props: Props) => {
       img.removeEventListener('error', handleError)
     }
   }, [])
-
-  const toggleFullscreen = useCallback(
-    () => window.electronAPI.toggleFullscreen(),
-    [],
-  )
-
-  const zoomBy = useCallback(
-    (value: number) =>
-      setZoom((zoom) => Math.min(Math.max(1, zoom * (1 + value)), 10)),
-    [],
-  )
-
-  const zoomIn = useCallback(() => zoomBy(0.1), [zoomBy])
-
-  const zoomOut = useCallback(() => zoomBy(-0.1), [zoomBy])
-
-  const resetZoom = useCallback(() => setZoom(1), [])
-
-  const movePrevious = useCallback(
-    () =>
-      setIndex((index) => {
-        return index <= 0 ? images.length - 1 : index - 1
-      }),
-    [images.length],
-  )
-
-  const moveNext = useCallback(
-    () =>
-      setIndex((index) => {
-        return index >= images.length - 1 ? 0 : index + 1
-      }),
-    [images.length],
-  )
-
-  const moveTo = useCallback((index: number) => setIndex(index), [])
 
   const value = {
     directory,

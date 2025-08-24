@@ -68,6 +68,37 @@ const Viewer = () => {
 
   const previousSize = usePrevious(size)
 
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    const wrapper = wrapperRef.current
+    if (wrapper) {
+      setDragOffset({
+        x: wrapper.scrollLeft + e.clientX,
+        y: wrapper.scrollTop + e.clientY,
+      })
+    }
+  }, [])
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      showControlBar()
+      hideControlBarAfter(2000)
+      setPosition({ x: e.clientX, y: e.clientY })
+      const wrapper = wrapperRef.current
+      if (wrapper && dragOffset) {
+        wrapper.scrollLeft = dragOffset.x - e.clientX
+        wrapper.scrollTop = dragOffset.y - e.clientY
+      }
+    },
+    [dragOffset, hideControlBarAfter, showControlBar],
+  )
+
+  const handleMouseUp = useCallback(() => setDragOffset(undefined), [])
+
+  const handleMouseEnterBar = useCallback(
+    () => showControlBar(),
+    [showControlBar],
+  )
+
   useEffect(
     () => setVisible(fullscreen || controlBarVisible),
     [fullscreen, controlBarVisible, setVisible],
@@ -146,37 +177,6 @@ const Viewer = () => {
       window.cancelAnimationFrame(id)
     }
   }, [hideControlBar])
-
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    const wrapper = wrapperRef.current
-    if (wrapper) {
-      setDragOffset({
-        x: wrapper.scrollLeft + e.clientX,
-        y: wrapper.scrollTop + e.clientY,
-      })
-    }
-  }, [])
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      showControlBar()
-      hideControlBarAfter(2000)
-      setPosition({ x: e.clientX, y: e.clientY })
-      const wrapper = wrapperRef.current
-      if (wrapper && dragOffset) {
-        wrapper.scrollLeft = dragOffset.x - e.clientX
-        wrapper.scrollTop = dragOffset.y - e.clientY
-      }
-    },
-    [dragOffset, hideControlBarAfter, showControlBar],
-  )
-
-  const handleMouseUp = useCallback(() => setDragOffset(undefined), [])
-
-  const handleMouseEnterBar = useCallback(
-    () => showControlBar(),
-    [showControlBar],
-  )
 
   return (
     <Box sx={{ height: '100%', width: '100%' }}>
