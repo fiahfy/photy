@@ -9,7 +9,7 @@ import {
 } from 'react'
 import ImageContext, { type File } from '~/contexts/ImageContext'
 import { useAppSelector } from '~/store'
-import { selectFile } from '~/store/window'
+import { selectError, selectFile, selectLoading } from '~/store/window'
 import { isImageFile } from '~/utils/file'
 
 type DirectoryState = {
@@ -71,6 +71,8 @@ const ImageProvider = (props: Props) => {
   const { children } = props
 
   const file = useAppSelector(selectFile)
+  const loading = useAppSelector(selectLoading)
+  const error = useAppSelector(selectError)
 
   const [{ directory, entries, status: directoryStatus }, directoryDispatch] =
     useReducer(directoryReducer, {
@@ -97,23 +99,29 @@ const ImageProvider = (props: Props) => {
     () => (index !== undefined ? images[index] : undefined),
     [images, index],
   )
+  const status = useMemo(() => {
+    if (loading) {
+      return 'loading'
+    }
+    if (error) {
+      return 'error'
+    }
+    if (directoryStatus !== 'loaded') {
+      return directoryStatus
+    }
+    return fileStatus
+  }, [directoryStatus, error, fileStatus, loading])
+
   const message = useMemo(() => {
-    switch (directoryStatus) {
+    switch (status) {
       case 'loading':
         return 'Loading...'
       case 'error':
         return 'Failed to load.'
       default:
-        switch (fileStatus) {
-          case 'loading':
-            return 'Loading...'
-          case 'error':
-            return 'Failed to load.'
-          default:
-            return undefined
-        }
+        return undefined
     }
-  }, [directoryStatus, fileStatus])
+  }, [status])
 
   const toggleFullscreen = useCallback(
     () => window.windowAPI.toggleFullscreen(),
@@ -156,7 +164,24 @@ const ImageProvider = (props: Props) => {
   }, [])
 
   useEffect(() => {
+    if (!file?.path) {
+      return
+    }
+
+    const index = images.findIndex((entry) => entry.path === file.path)
+    if (index === -1) {
+      return
+    }
+
+    setIndex(index)
+  }, [file?.path, images])
+
+  useEffect(() => {
     ;(async () => {
+      if (!file?.path) {
+        return
+      }
+
       directoryDispatch({ type: 'loading' })
       try {
         const directory = await window.electronAPI.getParentEntry(file.path)
@@ -166,15 +191,7 @@ const ImageProvider = (props: Props) => {
         directoryDispatch({ type: 'error' })
       }
     })()
-  }, [file.path])
-
-  useEffect(() => {
-    const index = images.findIndex((entry) => entry.path === file.path)
-    if (index === -1) {
-      return
-    }
-    setIndex(index)
-  }, [file.path, images])
+  }, [file?.path])
 
   useEffect(() => {
     const img = ref.current
