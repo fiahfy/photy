@@ -116,7 +116,7 @@ const ImageProvider = (props: Props) => {
   }, [directoryStatus, fileStatus])
 
   const toggleFullscreen = useCallback(
-    () => window.electronAPI.toggleFullscreen(),
+    () => window.windowAPI.toggleFullscreen(),
     [],
   )
 
@@ -151,7 +151,7 @@ const ImageProvider = (props: Props) => {
   const moveTo = useCallback((index: number) => setIndex(index), [])
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onFullscreenChange(setFullscreen)
+    const removeListener = window.windowAPI.onFullscreenChange(setFullscreen)
     return () => removeListener()
   }, [])
 
@@ -159,7 +159,7 @@ const ImageProvider = (props: Props) => {
     ;(async () => {
       directoryDispatch({ type: 'loading' })
       try {
-        const directory = await window.electronAPI.getParentDirectory(file.path)
+        const directory = await window.electronAPI.getParentEntry(file.path)
         const entries = await window.electronAPI.getEntries(directory.path)
         directoryDispatch({ type: 'loaded', payload: { directory, entries } })
       } catch {

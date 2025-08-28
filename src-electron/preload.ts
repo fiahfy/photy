@@ -8,24 +8,33 @@ import {
 } from 'electron'
 import type { ApplicationMenuParams } from './application-menu'
 
-contextBridge.exposeInMainWorld('electronAPI', {
+const applicationMenuOperations = {
+  update: (params: ApplicationMenuParams) => ipcRenderer.send('update', params),
+}
+
+const electronOperations = {
   getCursorPosition: () => ipcRenderer.invoke('getCursorPosition'),
   getEntries: (directoryPath: string) =>
     ipcRenderer.invoke('getEntries', directoryPath),
-  getParentDirectory: (filePath: string) =>
-    ipcRenderer.invoke('getParentDirectory', filePath),
+  getEntry: (path: string) => ipcRenderer.invoke('getEntry', path),
+  getParentEntry: (filePath: string) =>
+    ipcRenderer.invoke('getParentEntry', filePath),
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
+}
+
+const messageOperations = {
   // biome-ignore lint/suspicious/noExplicitAny: false positive
-  onMessage: (callback: (message: any) => void) => {
+  onMessage: (handler: (message: any) => void) => {
     // biome-ignore lint/suspicious/noExplicitAny: false positive
     const listener = (_event: IpcRendererEvent, message: any) =>
-      callback(message)
+      handler(message)
     ipcRenderer.on('onMessage', listener)
     return () => ipcRenderer.off('onMessage', listener)
   },
-  openFile: (file: File) =>
-    ipcRenderer.invoke('openFile', webUtils.getPathForFile(file)),
-  updateApplicationMenu: (params: ApplicationMenuParams) =>
-    ipcRenderer.invoke('updateApplicationMenu', params),
-  ...exposeContextMenuOperations(),
-  ...exposeWindowOperations(),
-})
+}
+
+contextBridge.exposeInMainWorld('applicationMenuAPI', applicationMenuOperations)
+contextBridge.exposeInMainWorld('contextMenuAPI', exposeContextMenuOperations())
+contextBridge.exposeInMainWorld('electronAPI', electronOperations)
+contextBridge.exposeInMainWorld('messageAPI', messageOperations)
+contextBridge.exposeInMainWorld('windowAPI', exposeWindowOperations())

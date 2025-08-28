@@ -3,13 +3,12 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
+import type { Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { selectWindowId } from '~/store/window-id'
 
-type File = { name: string; path: string; url: string }
-
 type WindowState = {
-  file?: File
+  file?: Entry
 }
 
 type State = {
@@ -33,7 +32,7 @@ export const windowSlice = createSlice({
       state,
       action: PayloadAction<{
         id: number
-        file: File
+        file: Entry
       }>,
     ) {
       const { id, file } = action.payload
@@ -66,9 +65,13 @@ export const selectFile = createSelector(
 )
 
 export const newWindow =
-  (file: File): AppThunk =>
+  (filePath: string): AppThunk =>
   async (dispatch, getState) => {
     const { newWindow } = windowSlice.actions
+
     const id = selectWindowId(getState())
-    dispatch(newWindow({ id, file }))
+
+    const entry = await window.electronAPI.getEntry(filePath)
+
+    dispatch(newWindow({ id, file: entry }))
   }

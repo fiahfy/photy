@@ -149,7 +149,7 @@ const registerApplicationMenu = (createWindow: (filePath: string) => void) => {
   update()
 
   ipcMain.handle(
-    'updateApplicationMenu',
+    'update',
     (_event: IpcMainInvokeEvent, params: ApplicationMenuParams) => {
       state = { ...state, ...params }
       update()

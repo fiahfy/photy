@@ -10,7 +10,6 @@ import {
   toggleShouldAlwaysShowSeekBar,
   toggleShouldCloseWindowOnEscapeKey,
 } from '~/store/settings'
-import { newWindow } from '~/store/window'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const App = () => {
@@ -25,11 +24,9 @@ const App = () => {
   useTitle(directory?.name ?? '')
 
   useEffect(() => {
-    const removeListener = window.electronAPI.onMessage((message) => {
+    const removeListener = window.messageAPI.onMessage((message) => {
       const { type, data } = message
       switch (type) {
-        case 'changeFile':
-          return dispatch(newWindow(data.file))
         case 'resetZoom':
           return resetZoom()
         case 'setViewModeOnOpen':
@@ -37,7 +34,7 @@ const App = () => {
             setViewModeOnOpen({ viewModeOnOpen: data.viewModeOnOpen }),
           )
         case 'toggleFullscreen':
-          return window.electronAPI.toggleFullscreen()
+          return window.windowAPI.toggleFullscreen()
         case 'toggleShouldAlwaysShowSeekBar':
           return dispatch(toggleShouldAlwaysShowSeekBar())
         case 'toggleShouldCloseWindowOnEscapeKey':
@@ -52,10 +49,21 @@ const App = () => {
   }, [dispatch, resetZoom, zoomIn, zoomOut])
 
   useEffect(() => {
-    const handler = () => window.electronAPI.updateApplicationMenu({})
-    handler()
-    window.addEventListener('focus', handler)
-    return () => window.removeEventListener('focus', handler)
+    const removeListener = window.windowAPI.onFocusChange((focused) => {
+      if (focused) {
+        window.applicationMenuAPI.update({})
+      }
+    })
+    return () => removeListener()
+  }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      const focused = await window.windowAPI.isFocused()
+      if (focused) {
+        window.applicationMenuAPI.update({})
+      }
+    })()
   }, [])
 
   useEffect(() => {
@@ -76,12 +84,12 @@ const App = () => {
         case 'Escape':
           e.preventDefault()
           if (shouldCloseWindowOnEscapeKey) {
-            return window.electronAPI.close()
+            return window.windowAPI.close()
           }
-          return window.electronAPI.exitFullscreen()
+          return window.windowAPI.exitFullscreen()
         case 'f':
           e.preventDefault()
-          return window.electronAPI.toggleFullscreen()
+          return window.windowAPI.toggleFullscreen()
       }
     }
     document.body.addEventListener('keydown', handler)
