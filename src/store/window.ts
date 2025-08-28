@@ -109,12 +109,12 @@ export const selectLoading = createSelector(
 )
 
 export const load =
-  (filePath: string): AppThunk =>
+  (filePath: string, force: boolean): AppThunk =>
   async (dispatch, getState) => {
     const { load, loaded, loadFailed } = windowSlice.actions
 
     const loading = selectLoading(getState())
-    if (loading) {
+    if (!force && loading) {
       return
     }
 
