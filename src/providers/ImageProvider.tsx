@@ -95,6 +95,7 @@ const ImageProvider = (props: Props) => {
     () => (index !== undefined ? images[index] : undefined),
     [images, index],
   )
+
   const status = useMemo(() => {
     if (loading) {
       return 'loading'
@@ -230,7 +231,7 @@ const ImageProvider = (props: Props) => {
     ref,
     resetZoom,
     size,
-    status: fileStatus,
+    status,
     toggleFullscreen,
     zoom,
     zoomBy,
