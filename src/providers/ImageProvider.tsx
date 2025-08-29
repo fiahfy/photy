@@ -14,7 +14,7 @@ import { isImageFile } from '~/utils/file'
 
 type DirectoryState = {
   directory: File | undefined
-  entries: File[]
+  images: File[]
   status: 'error' | 'loaded' | 'loading'
 }
 
@@ -22,7 +22,7 @@ type DirectoryAction =
   | { type: 'error' }
   | {
       type: 'loaded'
-      payload: { directory: File; entries: File[] }
+      payload: { directory: File; images: File[] }
     }
   | { type: 'loading' }
 
@@ -35,7 +35,7 @@ const directoryReducer = (_state: DirectoryState, action: DirectoryAction) => {
       }
     case 'error':
     case 'loading':
-      return { directory: undefined, entries: [], status: action.type }
+      return { directory: undefined, images: [], status: action.type }
   }
 }
 
@@ -74,10 +74,10 @@ const ImageProvider = (props: Props) => {
   const loading = useAppSelector(selectLoading)
   const error = useAppSelector(selectError)
 
-  const [{ directory, entries, status: directoryStatus }, directoryDispatch] =
+  const [{ directory, images, status: directoryStatus }, directoryDispatch] =
     useReducer(directoryReducer, {
       directory: undefined,
-      entries: [],
+      images: [],
       status: 'loading',
     })
   const [{ size, status: fileStatus }, fileDispatch] = useReducer(fileReducer, {
@@ -91,10 +91,6 @@ const ImageProvider = (props: Props) => {
 
   const ref = useRef<HTMLImageElement>(null)
 
-  const images = useMemo(
-    () => entries.filter((entry) => isImageFile(entry.path)),
-    [entries],
-  )
   const image = useMemo(
     () => (index !== undefined ? images[index] : undefined),
     [images, index],
@@ -186,7 +182,8 @@ const ImageProvider = (props: Props) => {
       try {
         const directory = await window.electronAPI.getParentEntry(file.path)
         const entries = await window.electronAPI.getEntries(directory.path)
-        directoryDispatch({ type: 'loaded', payload: { directory, entries } })
+        const images = entries.filter((entry) => isImageFile(entry.path))
+        directoryDispatch({ type: 'loaded', payload: { directory, images } })
       } catch {
         directoryDispatch({ type: 'error' })
       }
