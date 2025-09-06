@@ -13,10 +13,11 @@ const registerContextMenu = () => {
       click: () => send(event, { type: 'toggleShouldAlwaysShowSeekBar' }),
       type: 'checkbox',
     }),
-    quitAppWithEscapeKey: (event, _params, { checked }) => ({
-      label: 'Quit App with Escape Key',
+    closeWindowWithEscapeKey: (event, _params, { checked }) => ({
+      label: 'Close Window with Escape Key',
       checked,
-      click: () => send(event, { type: 'toggleShouldQuitAppWithEscapeKey' }),
+      click: () =>
+        send(event, { type: 'toggleShouldCloseWindowWithEscapeKey' }),
       type: 'checkbox',
     }),
     defaultViewMode: (event, _params, { defaultViewMode }) => ({

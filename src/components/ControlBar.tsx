@@ -12,14 +12,14 @@ import { useAppSelector } from '~/store'
 import {
   selectDefaultViewMode,
   selectShouldAlwaysShowSeekBar,
-  selectShouldQuitAppWithEscapeKey,
+  selectShouldCloseWindowWithEscapeKey,
 } from '~/store/settings'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const ControlBar = () => {
   const shouldAlwaysShowSeekBar = useAppSelector(selectShouldAlwaysShowSeekBar)
-  const shouldQuitAppWithEscapeKey = useAppSelector(
-    selectShouldQuitAppWithEscapeKey,
+  const shouldCloseWindowWithEscapeKey = useAppSelector(
+    selectShouldCloseWindowWithEscapeKey,
   )
   const defaultViewMode = useAppSelector(selectDefaultViewMode)
 
@@ -46,15 +46,15 @@ const ControlBar = () => {
           data: { checked: shouldAlwaysShowSeekBar },
         },
         {
-          type: 'quitAppWithEscapeKey',
-          data: { checked: shouldQuitAppWithEscapeKey },
+          type: 'closeWindowWithEscapeKey',
+          data: { checked: shouldCloseWindowWithEscapeKey },
         },
         {
           type: 'defaultViewMode',
           data: { defaultViewMode },
         },
       ]),
-    [shouldAlwaysShowSeekBar, shouldQuitAppWithEscapeKey, defaultViewMode],
+    [defaultViewMode, shouldAlwaysShowSeekBar, shouldCloseWindowWithEscapeKey],
   )
 
   return (
