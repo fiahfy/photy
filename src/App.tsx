@@ -5,16 +5,16 @@ import useImage from '~/hooks/useImage'
 import useTitle from '~/hooks/useTitle'
 import { useAppDispatch, useAppSelector } from '~/store'
 import {
-  selectShouldCloseWindowOnEscapeKey,
-  setViewModeOnOpen,
+  selectShouldQuitAppWithEscapeKey,
+  setDefaultViewMode,
   toggleShouldAlwaysShowSeekBar,
-  toggleShouldCloseWindowOnEscapeKey,
+  toggleShouldQuitAppWithEscapeKey,
 } from '~/store/settings'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const App = () => {
-  const shouldCloseWindowOnEscapeKey = useAppSelector(
-    selectShouldCloseWindowOnEscapeKey,
+  const shouldQuitAppWithEscapeKey = useAppSelector(
+    selectShouldQuitAppWithEscapeKey,
   )
   const dispatch = useAppDispatch()
 
@@ -29,16 +29,16 @@ const App = () => {
       switch (type) {
         case 'resetZoom':
           return resetZoom()
-        case 'setViewModeOnOpen':
+        case 'setDefaultViewMode':
           return dispatch(
-            setViewModeOnOpen({ viewModeOnOpen: data.viewModeOnOpen }),
+            setDefaultViewMode({ defaultViewMode: data.defaultViewMode }),
           )
         case 'toggleFullscreen':
           return window.windowAPI.toggleFullscreen()
         case 'toggleShouldAlwaysShowSeekBar':
           return dispatch(toggleShouldAlwaysShowSeekBar())
-        case 'toggleShouldCloseWindowOnEscapeKey':
-          return dispatch(toggleShouldCloseWindowOnEscapeKey())
+        case 'toggleShouldQuitAppWithEscapeKey':
+          return dispatch(toggleShouldQuitAppWithEscapeKey())
         case 'zoomIn':
           return zoomIn()
         case 'zoomOut':
@@ -83,8 +83,8 @@ const App = () => {
           return movePrevious()
         case 'Escape':
           e.preventDefault()
-          if (shouldCloseWindowOnEscapeKey) {
-            return window.windowAPI.close()
+          if (shouldQuitAppWithEscapeKey) {
+            return window.electronAPI.quit()
           }
           return window.windowAPI.exitFullscreen()
         case 'f':
@@ -94,7 +94,7 @@ const App = () => {
     }
     document.body.addEventListener('keydown', handler)
     return () => document.body.removeEventListener('keydown', handler)
-  }, [moveNext, movePrevious, shouldCloseWindowOnEscapeKey])
+  }, [moveNext, movePrevious, shouldQuitAppWithEscapeKey])
 
   const handleContextMenu = useMemo(() => createContextMenuHandler(), [])
 

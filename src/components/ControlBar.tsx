@@ -10,18 +10,18 @@ import { useMemo } from 'react'
 import useImage from '~/hooks/useImage'
 import { useAppSelector } from '~/store'
 import {
+  selectDefaultViewMode,
   selectShouldAlwaysShowSeekBar,
-  selectShouldCloseWindowOnEscapeKey,
-  selectViewModeOnOpen,
+  selectShouldQuitAppWithEscapeKey,
 } from '~/store/settings'
 import { createContextMenuHandler } from '~/utils/context-menu'
 
 const ControlBar = () => {
   const shouldAlwaysShowSeekBar = useAppSelector(selectShouldAlwaysShowSeekBar)
-  const shouldCloseWindowOnEscapeKey = useAppSelector(
-    selectShouldCloseWindowOnEscapeKey,
+  const shouldQuitAppWithEscapeKey = useAppSelector(
+    selectShouldQuitAppWithEscapeKey,
   )
-  const viewModeOnOpen = useAppSelector(selectViewModeOnOpen)
+  const defaultViewMode = useAppSelector(selectDefaultViewMode)
 
   const {
     image,
@@ -46,15 +46,15 @@ const ControlBar = () => {
           data: { checked: shouldAlwaysShowSeekBar },
         },
         {
-          type: 'closeWindowOnEscapeKey',
-          data: { checked: shouldCloseWindowOnEscapeKey },
+          type: 'quitAppWithEscapeKey',
+          data: { checked: shouldQuitAppWithEscapeKey },
         },
         {
-          type: 'viewModeOnOpen',
-          data: { viewModeOnOpen },
+          type: 'defaultViewMode',
+          data: { defaultViewMode },
         },
       ]),
-    [shouldAlwaysShowSeekBar, shouldCloseWindowOnEscapeKey, viewModeOnOpen],
+    [shouldAlwaysShowSeekBar, shouldQuitAppWithEscapeKey, defaultViewMode],
   )
 
   return (

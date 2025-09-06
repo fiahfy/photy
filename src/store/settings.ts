@@ -6,15 +6,15 @@ import {
 import type { AppState } from '~/store'
 
 type State = {
+  defaultViewMode: 'fullscreen' | 'maximized' | 'normal'
   shouldAlwaysShowSeekBar: boolean
-  shouldCloseWindowOnEscapeKey: boolean
-  viewModeOnOpen: 'fullscreen' | 'maximized' | 'default'
+  shouldQuitAppWithEscapeKey: boolean
 }
 
 const initialState: State = {
+  defaultViewMode: 'normal',
   shouldAlwaysShowSeekBar: false,
-  shouldCloseWindowOnEscapeKey: false,
-  viewModeOnOpen: 'default',
+  shouldQuitAppWithEscapeKey: false,
 }
 
 export const settingsSlice = createSlice({
@@ -24,14 +24,14 @@ export const settingsSlice = createSlice({
     replaceState(_state, action: PayloadAction<{ state: State }>) {
       return action.payload.state
     },
-    setViewModeOnOpen(
+    setDefaultViewMode(
       state,
-      action: PayloadAction<{ viewModeOnOpen: State['viewModeOnOpen'] }>,
+      action: PayloadAction<{ defaultViewMode: State['defaultViewMode'] }>,
     ) {
-      const { viewModeOnOpen } = action.payload
+      const { defaultViewMode } = action.payload
       return {
         ...state,
-        viewModeOnOpen,
+        defaultViewMode,
       }
     },
     toggleShouldAlwaysShowSeekBar(state) {
@@ -40,10 +40,10 @@ export const settingsSlice = createSlice({
         shouldAlwaysShowSeekBar: !state.shouldAlwaysShowSeekBar,
       }
     },
-    toggleShouldCloseWindowOnEscapeKey(state) {
+    toggleShouldQuitAppWithEscapeKey(state) {
       return {
         ...state,
-        shouldCloseWindowOnEscapeKey: !state.shouldCloseWindowOnEscapeKey,
+        shouldQuitAppWithEscapeKey: !state.shouldQuitAppWithEscapeKey,
       }
     },
   },
@@ -51,26 +51,26 @@ export const settingsSlice = createSlice({
 
 export const {
   replaceState,
-  setViewModeOnOpen,
+  setDefaultViewMode,
   toggleShouldAlwaysShowSeekBar,
-  toggleShouldCloseWindowOnEscapeKey,
+  toggleShouldQuitAppWithEscapeKey,
 } = settingsSlice.actions
 
 export default settingsSlice.reducer
 
 export const selectSettings = (state: AppState) => state.settings
 
+export const selectDefaultViewMode = createSelector(
+  selectSettings,
+  (settings) => settings.defaultViewMode,
+)
+
 export const selectShouldAlwaysShowSeekBar = createSelector(
   selectSettings,
   (settings) => settings.shouldAlwaysShowSeekBar,
 )
 
-export const selectShouldCloseWindowOnEscapeKey = createSelector(
+export const selectShouldQuitAppWithEscapeKey = createSelector(
   selectSettings,
-  (settings) => settings.shouldCloseWindowOnEscapeKey,
-)
-
-export const selectViewModeOnOpen = createSelector(
-  selectSettings,
-  (settings) => settings.viewModeOnOpen,
+  (settings) => settings.shouldQuitAppWithEscapeKey,
 )
