@@ -2,7 +2,7 @@
 
 [![Create Release](https://github.com/fiahfy/photy/actions/workflows/create-release.yml/badge.svg)](https://github.com/fiahfy/photy/actions/workflows/create-release.yml)
 
-> Simple Image Viewer based on Electron.
+> Simple image viewer based on Electron.
 
 ## Features
 
