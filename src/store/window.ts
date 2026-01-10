@@ -3,14 +3,11 @@ import {
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import type { Entry } from '~/interfaces'
 import type { AppState, AppThunk } from '~/store'
 import { selectWindowId } from '~/store/window-id'
 
 type WindowState = {
-  error: boolean
-  file?: Entry
-  loading: boolean
+  filePath?: string
 }
 
 type State = {
@@ -18,9 +15,7 @@ type State = {
 }
 
 const defaultWindowState: WindowState = {
-  error: false,
-  file: undefined,
-  loading: false,
+  filePath: undefined,
 }
 
 const initialState: State = {}
@@ -32,49 +27,13 @@ export const windowSlice = createSlice({
     replaceState(_state, action: PayloadAction<{ state: State }>) {
       return action.payload.state
     },
-    load(state, action: PayloadAction<{ id: number }>) {
-      const { id } = action.payload
+    load(state, action: PayloadAction<{ id: number; filePath: string }>) {
+      const { id, filePath } = action.payload
       return {
         ...state,
         [id]: {
           ...defaultWindowState,
-          loading: true,
-        },
-      }
-    },
-    loaded(
-      state,
-      action: PayloadAction<{
-        id: number
-        file: Entry
-      }>,
-    ) {
-      const { id, file } = action.payload
-      const window = state[id]
-      if (!window) {
-        return state
-      }
-      return {
-        ...state,
-        [id]: {
-          ...window,
-          file,
-          loading: false,
-        },
-      }
-    },
-    loadFailed(state, action: PayloadAction<{ id: number }>) {
-      const { id } = action.payload
-      const window = state[id]
-      if (!window) {
-        return state
-      }
-      return {
-        ...state,
-        [id]: {
-          ...window,
-          error: true,
-          loading: false,
+          filePath,
         },
       }
     },
@@ -93,38 +52,17 @@ export const selectCurrentWindow = createSelector(
   (window, windowId) => window[windowId] ?? defaultWindowState,
 )
 
-export const selectError = createSelector(
+export const selectFilePath = createSelector(
   selectCurrentWindow,
-  (window) => window.error,
-)
-
-export const selectFile = createSelector(
-  selectCurrentWindow,
-  (window) => window.file,
-)
-
-export const selectLoading = createSelector(
-  selectCurrentWindow,
-  (window) => window.loading,
+  (window) => window.filePath,
 )
 
 export const load =
-  (filePath: string, force: boolean): AppThunk =>
+  (filePath: string): AppThunk =>
   async (dispatch, getState) => {
-    const { load, loaded, loadFailed } = windowSlice.actions
-
-    const loading = selectLoading(getState())
-    if (!force && loading) {
-      return
-    }
+    const { load } = windowSlice.actions
 
     const id = selectWindowId(getState())
 
-    dispatch(load({ id }))
-    try {
-      const entry = await window.electronAPI.getEntry(filePath)
-      dispatch(loaded({ id, file: entry }))
-    } catch {
-      dispatch(loadFailed({ id }))
-    }
+    dispatch(load({ id, filePath }))
   }

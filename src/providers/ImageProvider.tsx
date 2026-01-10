@@ -9,7 +9,7 @@ import {
 } from 'react'
 import ImageContext, { type File } from '~/contexts/ImageContext'
 import { useAppSelector } from '~/store'
-import { selectError, selectFile, selectLoading } from '~/store/window'
+import { selectFilePath } from '~/store/window'
 import { isImageFile } from '~/utils/file'
 
 type DirectoryState = {
@@ -70,9 +70,7 @@ type Props = { children: ReactNode }
 const ImageProvider = (props: Props) => {
   const { children } = props
 
-  const file = useAppSelector(selectFile)
-  const loading = useAppSelector(selectLoading)
-  const error = useAppSelector(selectError)
+  const filePath = useAppSelector(selectFilePath)
 
   const [{ directory, images, status: directoryStatus }, directoryDispatch] =
     useReducer(directoryReducer, {
@@ -97,17 +95,11 @@ const ImageProvider = (props: Props) => {
   )
 
   const status = useMemo(() => {
-    if (loading) {
-      return 'loading'
-    }
-    if (error) {
-      return 'error'
-    }
     if (directoryStatus !== 'loaded') {
       return directoryStatus
     }
     return fileStatus
-  }, [directoryStatus, error, fileStatus, loading])
+  }, [directoryStatus, fileStatus])
 
   const message = useMemo(() => {
     switch (status) {
@@ -161,27 +153,27 @@ const ImageProvider = (props: Props) => {
   }, [])
 
   useEffect(() => {
-    if (!file?.path) {
+    if (!filePath) {
       return
     }
 
-    const index = images.findIndex((entry) => entry.path === file.path)
+    const index = images.findIndex((entry) => entry.path === filePath)
     if (index === -1) {
       return
     }
 
     setIndex(index)
-  }, [file?.path, images])
+  }, [filePath, images])
 
   useEffect(() => {
     ;(async () => {
-      if (!file?.path) {
+      if (!filePath) {
         return
       }
 
       directoryDispatch({ type: 'loading' })
       try {
-        const directory = await window.electronAPI.getParentEntry(file.path)
+        const directory = await window.electronAPI.getParentEntry(filePath)
         const entries = await window.electronAPI.getEntries(directory.path)
         const images = entries.filter((entry) => isImageFile(entry.path))
         directoryDispatch({ type: 'loaded', payload: { directory, images } })
@@ -189,7 +181,7 @@ const ImageProvider = (props: Props) => {
         directoryDispatch({ type: 'error' })
       }
     })()
-  }, [file?.path])
+  }, [filePath])
 
   useEffect(() => {
     const img = ref.current
